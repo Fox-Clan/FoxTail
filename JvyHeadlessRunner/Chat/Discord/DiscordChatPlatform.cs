@@ -69,7 +69,7 @@ public class DiscordChatPlatform : IChatPlatform
     {
         SessionInfo sessionInfo = world.GenerateSessionInfo();
         Uri url = sessionInfo.GetSessionURLs().First();
-        return SendMessageAsync(channel, url.ToString());
+        return SendMessageAsync(channel, $"# {world.Name}\n`{url.ToString()}`\n-# Copy this link and paste it into Resonite to join!");
     }
     
     private async Task MessageReceived(SocketMessage message)
