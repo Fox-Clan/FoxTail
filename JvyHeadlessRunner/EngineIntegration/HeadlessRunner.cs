@@ -136,6 +136,7 @@ public class HeadlessRunner : IDisposable
         InitTaskManager theLoader = new(this._logger, this._engine, this._progress);
 
         await theLoader.DoAllTasksAsync();
+        this._logger.LogInfo(ResoCategory.EngineInit, "Full init tasks complete!");
     }
 
     public void Dispose()
