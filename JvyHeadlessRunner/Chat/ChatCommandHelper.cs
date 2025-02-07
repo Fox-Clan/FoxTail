@@ -53,6 +53,7 @@ public class ChatCommandHelper
                     await Reply(messageSpan.ToString());
                     break;
                 case "grid":
+                    await Reply("Starting a grid for you, expect an invite shortly!");
                     WorldStartSettings startInfo = new()
                     {
                         InitWorld = WorldPresets.Grid,
@@ -61,7 +62,15 @@ public class ChatCommandHelper
                         HideFromListing = false,
                     };
                     World world = await Userspace.OpenWorld(startInfo);
-                    await Reply(world.SessionURLs.First().ToString()); // FIXME: crashes
+                    world.Name = $"Fennec Grid (opened by {user.Username})";
+                    await world.Coroutines.StartTask(async () =>
+                    {
+                        await InviteSender(world);
+                        while (!world.Permissions.PermissionHandlingInitialized)
+                            await new NextUpdate();
+
+                        world.Permissions.DefaultUserPermissions[user.UserId] = world.Permissions.HighestRole;
+                    });
                     break;
                 default:
                     if (channel.IsDirect)
@@ -80,6 +89,15 @@ public class ChatCommandHelper
         Task Reply(string content)
         {
             return channel.Platform.SendMessageAsync(channel, content);
+        }
+
+        async Task InviteSender(World world)
+        {
+            world.AllowUserToJoin(user.UserId);
+            while (!world.SessionURLs.Any())
+                await new NextUpdate();
+            
+            await channel.Platform.SendInviteAsync(channel, world);
         }
     }
 }
