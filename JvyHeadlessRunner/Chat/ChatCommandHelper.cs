@@ -84,6 +84,15 @@ public class ChatCommandHelper
                     }
 
                     string urlStr = messageSpan[args.Current].ToString();
+
+                    urlStr = urlStr switch
+                    {
+                        "eepy" => "resrec:///G-1UXaEEXzaEa/R-c061f0ff-dd34-41d4-9349-e8b3aed6b487",
+                        "cuddly" => "resrec:///U-AlphaNeon/R-b4a66dd6-b7da-424a-9538-0207cbb8cc59",
+                        "selfstudy" => "resrec:///G-1UXaEEXzaEa/R-42bbb839-2f3e-45bc-884b-4932e0acc201",
+                        "classroom" => "resrec:///G-1UXaEEXzaEa/R-c61252d9-333f-45f7-ae0b-2961fe58ddaf",
+                        _ => urlStr,
+                    };
                     
                     await Reply("Starting that world for you, expect an invite shortly!");
                     WorldStartSettings startInfo = new()
