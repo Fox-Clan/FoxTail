@@ -1,7 +1,7 @@
 ﻿using FrooxEngine;
 using NotEnoughLogs;
 
-namespace JvyHeadlessRunner;
+namespace JvyHeadlessRunner.EngineIntegration;
 
 public class LoggerEngineInitProgress : IEngineInitProgress
 {
