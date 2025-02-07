@@ -1,0 +1,85 @@
+﻿using Discord;
+using Discord.WebSocket;
+using FrooxEngine;
+using NotEnoughLogs;
+using SkyFrost.Base;
+
+namespace JvyHeadlessRunner.Chat.Discord;
+
+public class DiscordChatPlatform : IChatPlatform
+{
+    private readonly HeadlessContext _context;
+    private readonly DiscordSocketClient _client;
+
+    private string? _token;
+    
+    public DiscordChatPlatform(HeadlessContext context, string token)
+    {
+        this._token = token;
+        this._context = context;
+        this._client = new DiscordSocketClient(new DiscordSocketConfig()
+        {
+            GatewayIntents = GatewayIntents.Guilds | GatewayIntents.DirectMessages | GatewayIntents.GuildMessages | GatewayIntents.MessageContent
+        });
+        this._client.Log += message =>
+        {
+            LogLevel level = message.Severity switch
+            {
+                LogSeverity.Critical => LogLevel.Critical,
+                LogSeverity.Error => LogLevel.Error,
+                LogSeverity.Warning => LogLevel.Warning,
+                LogSeverity.Info => LogLevel.Info,
+                LogSeverity.Verbose => LogLevel.Debug,
+                LogSeverity.Debug => LogLevel.Trace,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            this._context.Logger.Log(level, ResoCategory.Discord, $"{message.Message}{message.Exception}");
+            
+            return Task.CompletedTask;
+        };
+        
+        this._client.MessageReceived += MessageReceived;
+    }
+
+    public async Task InitializeAsync()
+    {
+        await this._client.LoginAsync(TokenType.Bot, this._token);
+        this._token = null;
+
+#pragma warning disable CS4014
+        Task.Factory.StartNew(this._client.StartAsync, TaskCreationOptions.LongRunning);
+#pragma warning restore CS4014
+    }
+
+    public string Name => "Discord";
+    public bool IsUserApproved(IChatUser user)
+    {
+        return false;
+    }
+
+    public async Task SendMessageAsync(IChatChannel channel, string message)
+    {
+        if (this._client.GetChannel(ulong.Parse(channel.ChannelId)) is not SocketTextChannel discordChannel)
+            throw new Exception($"Channel {channel.ChannelId} ({channel.Name}) not found");
+
+        await discordChannel.SendMessageAsync(message);
+    }
+
+    public Task SendInviteAsync(IChatChannel channel, World world)
+    {
+        SessionInfo sessionInfo = world.GenerateSessionInfo();
+        Uri url = sessionInfo.GetSessionURLs().First();
+        return SendMessageAsync(channel, url.ToString());
+    }
+    
+    private async Task MessageReceived(SocketMessage message)
+    {
+        if (message.Author.Id == this._client.CurrentUser.Id)
+            return;
+        
+        DiscordChatChannel channel = new(this, message.Channel);
+        DiscordChatUser user = new(this, message.Author);
+
+        await this._context.CommandHelper.ReceiveCommand(channel, user, message.Content);
+    }
+}
