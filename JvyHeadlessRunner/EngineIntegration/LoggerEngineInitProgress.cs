@@ -5,14 +5,14 @@ namespace JvyHeadlessRunner.EngineIntegration;
 
 public class LoggerEngineInitProgress : IEngineInitProgress
 {
-    private readonly Logger _logger;
+    private readonly HeadlessContext _context;
     private string _fixedPhase = "Initial";
 
     private bool _ready;
 
-    public LoggerEngineInitProgress(Logger logger)
+    public LoggerEngineInitProgress(HeadlessContext context)
     {
-        this._logger = logger;   
+        this._context = context;   
     }
 
     public void SetFixedPhase(string phase)
@@ -22,7 +22,7 @@ public class LoggerEngineInitProgress : IEngineInitProgress
 
         this._fixedPhase = phase;
         ++this.FixedPhaseIndex;
-        this._logger.LogInfo(ResoCategory.EngineInit, $"-- {phase} --");
+        this._context.Logger.LogInfo(ResoCategory.EngineInit, $"-- {phase} --");
     }
 
     public void SetSubphase(string subphase, bool alwaysShow = false)
@@ -33,12 +33,12 @@ public class LoggerEngineInitProgress : IEngineInitProgress
         if (subphase == this._fixedPhase)
             return;
 
-        this._logger.LogInfo(ResoCategory.EngineInit, $"[{_fixedPhase}] {subphase}");
+        this._context.Logger.LogInfo(ResoCategory.EngineInit, $"[{_fixedPhase}] {subphase}");
     }
 
     public void EngineReady()
     {
-        this._logger.LogInfo(ResoCategory.EngineInit, $"Engine is ready after {FixedPhaseIndex} phases!");
+        this._context.Logger.LogInfo(ResoCategory.EngineInit, $"Engine is ready after {FixedPhaseIndex} phases!");
         this._ready = true;
         this.SetFixedPhase("Running");
     }

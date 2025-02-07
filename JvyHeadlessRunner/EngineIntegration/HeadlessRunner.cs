@@ -5,35 +5,33 @@ using NotEnoughLogs;
 
 namespace JvyHeadlessRunner.EngineIntegration;
 
-public class HeadlessRunner : IDisposable
+public class HeadlessRunner
 {
-    private readonly Logger _logger;
-    private readonly Engine _engine;
-    private readonly StandaloneSystemInfo _systemInfo;
+    private readonly HeadlessContext _context;
     private readonly IEngineInitProgress _progress;
 
     private float _tickRate = 1.0f;
     
-    public HeadlessRunner(Logger logger)
+    public HeadlessRunner(HeadlessContext context)
     {
-        this._logger = logger;
-        this._logger.LogInfo(ResoCategory.Runner, "Creating HeadlessRunner");
+        this._context = context;
+        this._context.Logger.LogInfo(ResoCategory.Runner, "Creating HeadlessRunner");
         
         ResoniteDllResolver.Initialize();
         
-        this._engine = new Engine();
-        this._systemInfo = new StandaloneSystemInfo();
-        this._progress = new LoggerEngineInitProgress(logger);
+        context.Engine = new Engine();
+        context.SystemInfo = new StandaloneSystemInfo();
+        this._progress = new LoggerEngineInitProgress(context);
         this._progress.SetFixedPhase("Waiting for Initialization");
         
         if(!Stopwatch.IsHighResolution)
-            this._logger.LogWarning(ResoCategory.Runner, "Stopwatch does not support high resolutions on this platform." +
-                                                         "Tick timings will be imprecise/jittery.");
+            this._context.Logger.LogWarning(ResoCategory.Runner, "Stopwatch does not support high resolutions on this platform." +
+                                                                 "Tick timings will be imprecise/jittery.");
     }
 
     public async Task InitializeEngineAsync()
     {
-        this._logger.LogInfo(ResoCategory.Runner, "Initializing FrooxEngine...");
+        this._context.Logger.LogInfo(ResoCategory.Runner, "Initializing FrooxEngine...");
 
         string path = Environment.CurrentDirectory;
 
@@ -53,13 +51,13 @@ public class HeadlessRunner : IDisposable
         };
         
         Stopwatch sw = Stopwatch.StartNew(); 
-        await this._engine.Initialize(path, options, this._systemInfo, null, this._progress);
-        this._logger.LogInfo(ResoCategory.Runner, $"Engine initialized after {sw.ElapsedMilliseconds}ms.");
-        this._logger.LogInfo(ResoCategory.Runner, "Starting userspace...");
+        await _context.Engine.Initialize(path, options, _context.SystemInfo, null, this._progress);
+        this._context.Logger.LogInfo(ResoCategory.Runner, $"Engine initialized after {sw.ElapsedMilliseconds}ms.");
+        this._context.Logger.LogInfo(ResoCategory.Runner, "Starting userspace...");
         sw.Restart();
 
-        World userspace = Userspace.SetupUserspace(this._engine);
-        this._logger.LogInfo(ResoCategory.Runner, $"Userspace set up after {sw.ElapsedMilliseconds}ms, starting engine loop.");
+        World userspace = Userspace.SetupUserspace(_context.Engine);
+        this._context.Logger.LogInfo(ResoCategory.Runner, $"Userspace set up after {sw.ElapsedMilliseconds}ms, starting engine loop.");
         
         StartEngineThread();
         
@@ -102,7 +100,7 @@ public class HeadlessRunner : IDisposable
             }
             catch (Exception e)
             {
-                this._logger.LogError(ResoCategory.Runner, "Error in engine update: {0}", e);
+                this._context.Logger.LogError(ResoCategory.Runner, "Error in engine update: {0}", e);
             }
 
             float requiredTicks = ((1000f / this._tickRate) * TimeSpan.TicksPerMillisecond);
@@ -113,8 +111,8 @@ public class HeadlessRunner : IDisposable
 
     private void EngineTick()
     {
-        this._engine.RunUpdateLoop();
-        this._systemInfo.FrameFinished();
+        this._context.Engine.RunUpdateLoop();
+        this._context.SystemInfo.FrameFinished();
         
         float dspTickRate = 0f;
         if (this._tickRate > 0f)
@@ -133,18 +131,10 @@ public class HeadlessRunner : IDisposable
     public async Task StartFullInitTasksAsync()
     {
         this._progress.SetFixedPhase("Full Init Tasks");
-        InitTaskManager theLoader = new(this._logger, this._engine, this._progress);
+        InitTaskManager theLoader = new(this._context, this._progress);
 
         await theLoader.DoAllTasksAsync();
-        this._logger.LogInfo(ResoCategory.EngineInit, "Full init tasks complete!");
+        this._context.Logger.LogInfo(ResoCategory.EngineInit, "Full init tasks complete!");
         this._progress.SetFixedPhase("Awaiting EngineReady");
-    }
-
-    public void Dispose()
-    {
-        _engine.Dispose();
-        _logger.Dispose();
-        
-        GC.SuppressFinalize(this);
     }
 }

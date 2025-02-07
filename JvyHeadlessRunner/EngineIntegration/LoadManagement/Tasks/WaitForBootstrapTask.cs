@@ -17,7 +17,7 @@ public class WaitForBootstrapTask : InitTask, IDisposable
     
     public override string Name => "Wait for Userspace Bootstrap";
     public override InitTaskStage Stage => InitTaskStage.Immediate;
-    public override async Task ExecuteAsync(Logger logger, Engine engine)
+    public override async Task ExecuteAsync(HeadlessContext context)
     {
         Stopwatch sw = Stopwatch.StartNew();
         while (!Bootstrapped)
@@ -28,7 +28,7 @@ public class WaitForBootstrapTask : InitTask, IDisposable
             await Task.Delay(25);
         }
         
-        logger.LogInfo(ResoCategory.EngineInit, $"Userspace has been bootstrapped! Took ~{sw.ElapsedMilliseconds}ms.");
+        context.Logger.LogInfo(ResoCategory.EngineInit, $"Userspace has been bootstrapped! Took ~{sw.ElapsedMilliseconds}ms.");
     }
 
     public void Dispose()

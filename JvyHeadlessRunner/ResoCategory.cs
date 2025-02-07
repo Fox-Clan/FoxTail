@@ -7,4 +7,5 @@ public enum ResoCategory : byte
     EngineInit,
     Harmony,
     Cloud,
+    Chat
 }

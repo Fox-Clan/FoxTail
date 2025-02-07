@@ -9,5 +9,5 @@ public abstract class InitTask
 {
     public abstract string Name { get; }
     public abstract InitTaskStage Stage { get; }
-    public abstract Task ExecuteAsync(Logger logger, Engine engine);
+    public abstract Task ExecuteAsync(HeadlessContext context);
 }
