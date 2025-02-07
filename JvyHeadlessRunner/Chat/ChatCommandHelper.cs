@@ -91,6 +91,7 @@ public class ChatCommandHelper
                         "cuddly" => "resrec:///U-AlphaNeon/R-b4a66dd6-b7da-424a-9538-0207cbb8cc59",
                         "selfstudy" => "resrec:///G-1UXaEEXzaEa/R-42bbb839-2f3e-45bc-884b-4932e0acc201",
                         "classroom" => "resrec:///G-1UXaEEXzaEa/R-c61252d9-333f-45f7-ae0b-2961fe58ddaf",
+                        "sgc" => "resrec:///G-1UXaEEXzaEa/R-0ece8266-41ef-4837-8e2a-3249e858bc34",
                         _ => urlStr,
                     };
                     
