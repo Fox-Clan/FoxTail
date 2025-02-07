@@ -57,12 +57,12 @@ public class ChatCommandHelper
                     WorldStartSettings startInfo = new()
                     {
                         InitWorld = WorldPresets.Grid,
-                        DefaultAccessLevel = SessionAccessLevel.Contacts,
                         CreateLoadIndicator = false,
                         HideFromListing = false,
                     };
                     World world = await Userspace.OpenWorld(startInfo);
                     world.Name = $"Fennec Grid (opened by {user.Username})";
+                    world.AccessLevel = SessionAccessLevel.Contacts;
                     await world.Coroutines.StartTask(async () =>
                     {
                         await InviteSender(world);
