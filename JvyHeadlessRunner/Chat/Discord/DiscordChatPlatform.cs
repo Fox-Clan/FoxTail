@@ -1,8 +1,10 @@
-﻿using Discord;
+﻿using System.Data;
+using Discord;
 using Discord.WebSocket;
 using FrooxEngine;
 using NotEnoughLogs;
 using SkyFrost.Base;
+using UserStatus = Discord.UserStatus;
 
 namespace JvyHeadlessRunner.Chat.Discord;
 
@@ -37,6 +39,8 @@ public class DiscordChatPlatform : IChatPlatform
             
             return Task.CompletedTask;
         };
+
+        this._client.LatencyUpdated += async (_, _) => await UpdateStatus();
         
         this._client.MessageReceived += MessageReceived;
     }
@@ -77,5 +81,32 @@ public class DiscordChatPlatform : IChatPlatform
         DiscordChatUser user = new(this, message.Author);
 
         await this._context.CommandHelper.ReceiveCommand(channel, user, message.Content);
+    }
+
+    private string _lastCustomStatus = "";
+    private UserStatus _lastStatus = UserStatus.Online;
+
+    private async Task UpdateStatus()
+    {
+        this._context.Logger.LogDebug(ResoCategory.Discord, "Updating Discord status...");
+        WorldManager worlds = _context.Engine.WorldManager;
+        int userCount = worlds.Worlds.Sum(w => w.AllUsers.Count(u => u.HeadDevice != HeadOutputDevice.Headless));
+        int worldCount = worlds.WorldCount - 1;
+        
+        UserStatus status = userCount == 0 || worldCount == 0 ? UserStatus.Idle : UserStatus.Online;
+        if (status != this._lastStatus)
+        {
+            this._context.Logger.LogTrace(ResoCategory.Discord, $"Setting UserStatus to {status}");
+            await this._client.SetStatusAsync(status);
+            this._lastStatus = status;
+        }
+
+        string customStatus = $"Hosting {worldCount} world{(worldCount == 1 ? "" : "s")} with {userCount} player{(userCount == 1 ? "" : "s")}";
+        if (customStatus != this._lastCustomStatus)
+        {
+            this._context.Logger.LogTrace(ResoCategory.Discord, $"Setting CustomStatus to {customStatus}");
+            await this._client.SetCustomStatusAsync(customStatus);
+            this._lastCustomStatus = customStatus;
+        }
     }
 }
