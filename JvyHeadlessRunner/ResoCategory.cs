@@ -2,5 +2,7 @@
 
 public enum ResoCategory : byte
 {
-    FrooxEngine
+    FrooxEngine,
+    Runner,
+    EngineInit,
 }

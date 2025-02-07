@@ -3,45 +3,44 @@ using FrooxEngine;
 using JvyHeadlessRunner;
 using NotEnoughLogs;
 using NotEnoughLogs.Behaviour;
+using SkyFrost.Base;
 
-
-ConsoleColor oldColor = Console.ForegroundColor;
-Console.ForegroundColor = ConsoleColor.Magenta;
-Console.WriteLine("jvyden headless runner");
-Console.ForegroundColor = oldColor;
-
-Logger logger = new(new LoggerConfiguration
+internal static class Program
 {
-    Behaviour = new QueueLoggingBehaviour(),
-    MaxLevel = LogLevel.Trace,
-});
+    public static Logger Logger;
+    public static HeadlessRunner Runner;
+    
+    public static async Task Main(string[] args)
+    {
+        ConsoleColor oldColor = Console.ForegroundColor;
+        Console.ForegroundColor = ConsoleColor.Magenta;
+        Console.WriteLine("jvyden headless runner");
+        Console.ForegroundColor = oldColor;
 
-ResoniteDllResolver.Initialize();
+        Logger = new(new LoggerConfiguration
+        {
+            Behaviour = new QueueLoggingBehaviour(),
+            MaxLevel = LogLevel.Trace,
+        });
+        
+        UniLog.OnLog += s =>
+        {
+            Logger.LogDebug(ResoCategory.FrooxEngine, s);
+        };
 
-UniLog.OnLog += s =>
-{
-    logger.LogInfo(ResoCategory.FrooxEngine, s);
-};
+        UniLog.OnError += s =>
+        {
+            Logger.LogError(ResoCategory.FrooxEngine, s);
+        };
 
-UniLog.OnError += s =>
-{
-    logger.LogError(ResoCategory.FrooxEngine, s);
-};
+        UniLog.OnWarning += s =>
+        {
+            Logger.LogWarning(ResoCategory.FrooxEngine, s);
+        };
 
-UniLog.OnWarning += s =>
-{
-    logger.LogWarning(ResoCategory.FrooxEngine, s);
-};
+        Runner = new HeadlessRunner(Logger);
+        await Runner.InitializeEngineAsync();
 
-Console.WriteLine("Initializing FrooxEngine...");
-StandaloneFrooxEngineRunner runner = new();
-await runner.Initialize(new LaunchOptions
-{
-    VerboseInit = true,
-    OutputDevice = HeadOutputDevice.Headless,
-    DisablePlatformInterfaces = true,
-});
-
-Console.WriteLine("FrooxEngine is up!");
-
-await Task.Delay(-1);
+        await Task.Delay(-1);
+    }
+}
