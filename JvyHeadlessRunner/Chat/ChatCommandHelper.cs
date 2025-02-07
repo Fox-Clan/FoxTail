@@ -1,4 +1,5 @@
-﻿using FrooxEngine;
+﻿using System.Collections.Frozen;
+using FrooxEngine;
 using SkyFrost.Base;
 
 namespace JvyHeadlessRunner.Chat;
@@ -8,6 +9,22 @@ public class ChatCommandHelper
     private readonly HeadlessContext _context;
 
     private readonly List<IChatPlatform> _platforms = [];
+
+    private readonly FrozenSet<string> _approvedUserIds = new List<string>
+    {
+        // Discord
+        "956347815267827713", // jvyden
+        "329085556791443459", // beyley
+        "193490239539511296", // steph
+        "288074994188156928", // guppy
+        // Resonite
+        "U-1YIjc7KyPL6", // jvyden
+        "U-1XNdZruECCu", // beyley
+        "U-1UOo6cljQsy", // steph
+        "U-TheGuppy525", // guppy
+    }.ToFrozenSet();
+
+    private bool CheckPerms(IChatUser user) => _approvedUserIds.Contains(user.UserId);
 
     public ChatCommandHelper(HeadlessContext context)
     {
@@ -77,6 +94,12 @@ public class ChatCommandHelper
                 }
                 case "start":
                 {
+                    if (!CheckPerms(user))
+                    {
+                        await Deny();
+                        return;
+                    }
+                        
                     if (!args.MoveNext())
                     {
                         await Reply("I need the record URL to start the world.");
@@ -133,6 +156,12 @@ public class ChatCommandHelper
         }
 
         return;
+
+        Task Deny()
+        {
+            return Reply("Ah-ah-ah, you didn't say the magic word!");
+        }
+        
         Task Reply(string content)
         {
             return channel.Platform.SendMessageAsync(channel, content);

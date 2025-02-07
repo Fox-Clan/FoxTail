@@ -22,11 +22,6 @@ public class ResoniteChatPlatform : IChatPlatform
 
     public string Name => "Resonite";
 
-    public bool IsUserApproved(IChatUser user)
-    {
-        return false; // TODO
-    }
-
     public async Task SendMessageAsync(IChatChannel channel, string message)
     {
         await this._context.Engine.Cloud.Messages

@@ -52,10 +52,6 @@ public class DiscordChatPlatform : IChatPlatform
     }
 
     public string Name => "Discord";
-    public bool IsUserApproved(IChatUser user)
-    {
-        return false;
-    }
 
     public async Task SendMessageAsync(IChatChannel channel, string message)
     {
