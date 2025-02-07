@@ -49,9 +49,12 @@ public class ChatCommandHelper
             switch (command)
             {
                 case "echo":
+                {
                     await Reply(messageSpan.ToString());
                     break;
+                }
                 case "grid":
+                {
                     await Reply("Starting a grid for you, expect an invite shortly!");
                     WorldStartSettings startInfo = new()
                     {
@@ -71,10 +74,45 @@ public class ChatCommandHelper
                         world.Permissions.DefaultUserPermissions[user.UserId] = world.Permissions.HighestRole;
                     });
                     break;
+                }
+                case "start":
+                {
+                    if (!args.MoveNext())
+                    {
+                        await Reply("I need the record URL to start the world.");
+                        break;
+                    }
+
+                    string urlStr = messageSpan[args.Current].ToString();
+                    
+                    await Reply("Starting that world for you, expect an invite shortly!");
+                    WorldStartSettings startInfo = new()
+                    {
+                        URIs = [
+                            new Uri(urlStr),
+                        ],
+                        CreateLoadIndicator = false,
+                        HideFromListing = false,
+                    };
+                    
+                    World world = await Userspace.OpenWorld(startInfo);
+                    world.AccessLevel = SessionAccessLevel.Contacts;
+                    await world.Coroutines.StartTask(async () =>
+                    {
+                        await InviteSender(world);
+                        while (!world.Permissions.PermissionHandlingInitialized)
+                            await new NextUpdate();
+
+                        world.Permissions.DefaultUserPermissions[user.UserId] = world.Permissions.HighestRole;
+                    });
+                    break;
+                }
                 default:
+                {
                     if (channel.IsDirect)
                         await Reply("fennec no know that command :(");
                     break;
+                }
             }
         }
         catch (Exception e)
