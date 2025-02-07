@@ -25,7 +25,11 @@ internal static class Program
         Logger = new(new LoggerConfiguration
         {
             Behaviour = new QueueLoggingBehaviour(),
+            #if DEBUG
             MaxLevel = LogLevel.Trace,
+            #else
+            MaxLevel = LogLevel.Info
+            #endif
         });
         
         Logger.LogInfo(ResoCategory.Harmony, "Initializing Harmony...");

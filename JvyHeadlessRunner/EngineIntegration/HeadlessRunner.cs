@@ -137,6 +137,7 @@ public class HeadlessRunner : IDisposable
 
         await theLoader.DoAllTasksAsync();
         this._logger.LogInfo(ResoCategory.EngineInit, "Full init tasks complete!");
+        this._progress.SetFixedPhase("Awaiting EngineReady");
     }
 
     public void Dispose()
