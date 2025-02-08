@@ -7,9 +7,9 @@ namespace FoxTail.EngineIntegration;
 public class HeadlessRunner
 {
     private readonly HeadlessContext _context;
-    private readonly IEngineInitProgress _progress;
+    private readonly LoggerEngineInitProgress _progress;
 
-    private float _tickRate = 60.0f;
+    private float TickRate => _context.Config.TickRate;
     
     public HeadlessRunner(HeadlessContext context)
     {
@@ -102,7 +102,7 @@ public class HeadlessRunner
                 this._context.Logger.LogError(ResoCategory.Runner, "Error in engine update: {0}", e);
             }
 
-            float requiredTicks = ((1000f / this._tickRate) * TimeSpan.TicksPerMillisecond);
+            long requiredTicks = (long)(1000d / this.TickRate * TimeSpan.TicksPerMillisecond);
             sw.Restart();
             SpinWait.SpinUntil(() => sw.ElapsedTicks >= requiredTicks);
         }
@@ -114,9 +114,9 @@ public class HeadlessRunner
         this._context.SystemInfo.FrameFinished();
         
         float dspTickRate = 0f;
-        if (this._tickRate > 0f)
+        if (this.TickRate > 0f)
         {
-            dspTickRate = 1f / this._tickRate;
+            dspTickRate = 1f / this.TickRate;
         }
 
         this._dspTime += dspTickRate * 48000f;
