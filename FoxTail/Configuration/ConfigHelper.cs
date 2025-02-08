@@ -16,7 +16,7 @@ public static class ConfigHelper
             context.Logger.LogTrace(ResoCategory.Config, "File does not exist, creating & writing");
             config = new TConfig();
             File.WriteAllText(filename, JsonConvert.SerializeObject(config));
-            context.Logger.LogInfo(ResoCategory.Config, $"The config file `{filename}` did not exist. A new one was created in the current directory.");
+            context.Logger.LogWarning(ResoCategory.Config, $"The config file `{filename}` did not exist. A new one was created in the current directory.");
         }
         else
         {

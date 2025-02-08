@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using FoxTail.Configuration;
 using FoxTail.EngineIntegration.LoadManagement;
 using FrooxEngine;
 
@@ -67,6 +68,55 @@ public class HeadlessRunner
         for (int i = 0; i < 5; i++)
         {
             await userspace.Coroutines.StartTask(static async () => await default(NextUpdate));
+        }
+        
+        this._context.Logger.LogInfo(ResoCategory.Runner, "Allowing hosts... please review this list carefully to ensure you aren't exposing any security holes.");
+        await _context.Engine.GlobalCoroutineManager.StartTask(c =>
+        {
+            SecurityManager security = c.Engine.Security;
+            FoxTailConfig config = c.Config;
+            
+            AllowHosts(c, config.AllowedHttpHosts, security.TemporarilyAllowHTTP);
+            AllowHosts(c, config.AllowedWebsocketHosts, security.TemporarilyAllowWebsocket);
+            AllowHosts(c, config.AllowedOSCSenderHosts, security.TemporarilyAllowOSC_Sender);
+            
+            foreach (int port in config.AllowedOSCReceiverPorts)
+            {
+                security.TemporarilyAllowOSC_Receiver(port);
+            }
+
+            return Task.CompletedTask;
+        }, _context);
+        this._context.Logger.LogInfo(ResoCategory.Runner, "Allowed all hosts!");
+    }
+
+    private static void AllowHosts(HeadlessContext c, IEnumerable<string> list, Action<string> allowFunc)
+    {
+        foreach (string host in list)
+        {
+            if (!Uri.TryCreate(host, UriKind.Absolute, out Uri? uri))
+            {
+                c.Logger.LogWarning(ResoCategory.Runner, $"Couldn't allow host {host} as it's an invalid URL");
+                continue;
+            }
+
+            c.Logger.LogInfo(ResoCategory.Runner, $"ALLOWING HOST {host}!");
+            allowFunc(uri.Host);
+        }
+    }
+    
+    private static void AllowHosts(HeadlessContext c, IEnumerable<string> list, Action<string, int> allowFunc)
+    {
+        foreach (string host in list)
+        {
+            if (!Uri.TryCreate(host, UriKind.Absolute, out Uri? uri))
+            {
+                c.Logger.LogWarning(ResoCategory.Runner, $"Couldn't allow host {host} as it's an invalid URL");
+                continue;
+            }
+
+            c.Logger.LogInfo(ResoCategory.Runner, $"ALLOWING HOST {host}!");
+            allowFunc(uri.Host, uri.Port);
         }
     }
     
