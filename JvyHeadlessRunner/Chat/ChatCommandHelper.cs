@@ -169,6 +169,31 @@ public class ChatCommandHelper
                     await Reply("Closed " + world.Name + ".");
                     break;
                 }
+                case "save":
+                {
+                    if (!CheckPerms(user))
+                    {
+                        await Deny();
+                        return;
+                    }
+                    
+                    World? world = GetWorldUserIn(user);
+                    if (world == null)
+                    {
+                        await Reply("I couldn't find the world you were in, so I can't save it. Try joining/focusing the world.");
+                        return;
+                    }
+
+                    if (!Userspace.CanSave(world))
+                    {
+                        await Reply("I can't save that world as I don't own that world. You can use 'Save As...' under Session to save it yourself.");
+                        return;
+                    }
+
+                    await Userspace.SaveWorldAuto(world, SaveType.Overwrite, false);
+                    await Reply("World saved and overwritten.");
+                    break;
+                }
                 default:
                 {
                     if (channel.IsDirect)
