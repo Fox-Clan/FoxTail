@@ -18,7 +18,7 @@ internal static class Program
     {
         ConsoleColor oldColor = Console.ForegroundColor;
         Console.ForegroundColor = ConsoleColor.Magenta;
-        Console.WriteLine("jvyden headless runner");
+        Console.WriteLine("FoxTail for Resonite");
         Console.ForegroundColor = oldColor;
 
         Context = new HeadlessContext();
@@ -33,7 +33,7 @@ internal static class Program
         });
         
         Context.Logger.LogInfo(ResoCategory.Harmony, "Initializing Harmony...");
-        HeadlessContext.Harmony = new Harmony(nameof(JvyHeadlessRunner));
+        HeadlessContext.Harmony = new Harmony(nameof(FoxTail));
         Harmony.DEBUG = true;
         Stopwatch sw = Stopwatch.StartNew();
         HeadlessContext.Harmony.PatchAll();
