@@ -8,5 +8,6 @@ public enum ResoCategory : byte
     Harmony,
     Cloud,
     Chat,
-    Discord
+    Discord,
+    WorldInit,
 }
