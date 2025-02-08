@@ -9,7 +9,7 @@ public class HeadlessRunner
     private readonly HeadlessContext _context;
     private readonly IEngineInitProgress _progress;
 
-    private float _tickRate = 1.0f;
+    private float _tickRate = 60.0f;
     
     public HeadlessRunner(HeadlessContext context)
     {
