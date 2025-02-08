@@ -1,4 +1,5 @@
 ﻿using System.Collections.Frozen;
+using System.Diagnostics;
 using FoxTail.Chat.Resonite;
 using FrooxEngine;
 using SkyFrost.Base;
@@ -240,6 +241,19 @@ public class ChatCommandHelper
                     }, worldUser);
                     break;
                 }
+                case "gc":
+                    if (user.UserId != "U-1XNdZruECCu" && user.UserId != "U-1YIjc7KyPL6")
+                    {
+                        await Deny();
+                        return;
+                    }
+
+                    await Reply("Collecting...");
+                    Stopwatch sw = Stopwatch.StartNew();
+                    GC.Collect();
+                    sw.Stop();
+                    await Reply($"Garbage collection took {sw.ElapsedMilliseconds}.");
+                    break;
                 default:
                 {
                     if (channel.IsDirect)
