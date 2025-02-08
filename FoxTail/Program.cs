@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Elements.Core;
+using FoxTail.Configuration;
 using FoxTail.EngineIntegration;
 using FoxTail.EngineIntegration.LoadManagement.Tasks;
 using HarmonyLib;
@@ -31,6 +32,9 @@ internal static class Program
             MaxLevel = LogLevel.Info
 #endif
         });
+        
+        Context.Logger.LogInfo(ResoCategory.Config, "Loading configurations...");
+        Context.Config = ConfigHelper.GetOrCreateConfig<FoxTailConfig>(Context, "foxtail.json");
         
         Context.Logger.LogInfo(ResoCategory.Harmony, "Initializing Harmony...");
         HeadlessContext.Harmony = new Harmony(nameof(FoxTail));
