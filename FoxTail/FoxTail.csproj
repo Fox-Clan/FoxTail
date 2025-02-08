@@ -1,0 +1,39 @@
+﻿<Project Sdk="Remora.Resonite.Sdk">
+
+    <PropertyGroup>
+      <OutputType>Exe</OutputType>
+      <ResoniteProjectType>standalone</ResoniteProjectType>
+      <ResoniteTarget>headless</ResoniteTarget>
+      <TargetFramework>net9.0</TargetFramework>
+      
+      <Nullable>enable</Nullable>
+      <ImplicitUsings>true</ImplicitUsings>
+      <LangVersion>latest</LangVersion>
+      
+      <ResoniteForceReferenceAssemblies>false</ResoniteForceReferenceAssemblies>
+      <ResonitePath>D:\headless\headless</ResonitePath>
+      <AssemblyName>FoxTail</AssemblyName>
+      <RootNamespace>FoxTail</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ResoniteReference Include="Resonite"/>
+      <ResoniteReference Include="FrooxEngine"/>
+      <ResoniteReference Include="FrooxEngine.Store"/>
+      <ResoniteReference Include="SkyFrost.Base"/>
+      <ResoniteReference Include="SkyFrost.Base.Models"/>
+      <ResoniteReference Include="Elements.Core"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Discord.Net.Rest" Version="3.17.1" />
+      <PackageReference Include="Discord.Net.WebSocket" Version="3.17.1" />
+      <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
+      <PackageReference Include="Lib.Harmony" Version="2.3.5" />
+      <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.1" />
+      <PackageReference Include="NotEnoughLogs" Version="2.0.3" />
+    </ItemGroup>
+    
+    
+
+</Project>
