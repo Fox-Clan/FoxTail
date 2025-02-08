@@ -16,12 +16,6 @@ public class StartupWorldsTask : InitTask
             InviteMessage = "<color=red>EEPY TIME!!!!!!!!</color>",
             HideFromListing = false,
         },
-        new()
-        {
-            FriendlyName = "Platform",
-            InitWorld = WorldPresets.SimplePlatform,
-            InviteUsernames = ["jvyden"],
-        }
     ];
     
     public override string Name => "Default World Startup";
