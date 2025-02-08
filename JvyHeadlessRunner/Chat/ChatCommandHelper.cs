@@ -1,5 +1,6 @@
 ﻿using System.Collections.Frozen;
 using FrooxEngine;
+using JvyHeadlessRunner.Chat.Resonite;
 using SkyFrost.Base;
 
 namespace JvyHeadlessRunner.Chat;
@@ -34,6 +35,15 @@ public class ChatCommandHelper
     public void AddPlatform(IChatPlatform platform)
     {
         _platforms.Add(platform);
+    }
+
+    public World? GetWorldUserIn(IChatUser user)
+    {
+        if (user is not ResoniteChatUser)
+            return null;
+
+        return this._context.Engine.WorldManager.Worlds
+            .FirstOrDefault(w => w.AllUsers.FirstOrDefault(u => u.UserID == user.UserId && u.IsPresentInWorld) != null);
     }
 
     public async Task ReceiveCommand(IChatChannel channel, IChatUser user, string message)
@@ -138,6 +148,25 @@ public class ChatCommandHelper
 
                         world.Permissions.DefaultUserPermissions[user.UserId] = world.Permissions.HighestRole;
                     });
+                    break;
+                }
+                case "close":
+                {
+                    if (!CheckPerms(user))
+                    {
+                        await Deny();
+                        return;
+                    }
+                    
+                    World? world = GetWorldUserIn(user);
+                    if (world == null)
+                    {
+                        await Reply("I couldn't find the world you were in, so I can't close it. Try joining/focusing the world.");
+                        return;
+                    }
+                    
+                    world.Destroy();
+                    await Reply("Closed " + world.Name + ".");
                     break;
                 }
                 default:

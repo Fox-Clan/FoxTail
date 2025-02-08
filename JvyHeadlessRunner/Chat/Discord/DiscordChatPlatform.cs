@@ -19,9 +19,12 @@ public class DiscordChatPlatform : IChatPlatform
     {
         this._token = token;
         this._context = context;
-        this._client = new DiscordSocketClient(new DiscordSocketConfig()
+        this._client = new DiscordSocketClient(new DiscordSocketConfig
         {
-            GatewayIntents = GatewayIntents.Guilds | GatewayIntents.DirectMessages | GatewayIntents.GuildMessages | GatewayIntents.MessageContent
+            GatewayIntents = GatewayIntents.Guilds |
+                             GatewayIntents.DirectMessages |
+                             GatewayIntents.GuildMessages |
+                             GatewayIntents.MessageContent
         });
         this._client.Log += message =>
         {
