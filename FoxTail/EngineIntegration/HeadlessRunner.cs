@@ -71,8 +71,9 @@ public class HeadlessRunner
         }
         
         this._context.Logger.LogInfo(ResoCategory.Runner, "Allowing hosts... please review this list carefully to ensure you aren't exposing any security holes.");
-        await _context.Engine.GlobalCoroutineManager.StartTask(c =>
+        await _context.Engine.GlobalCoroutineManager.StartTask(async c =>
         {
+            await new NextUpdate();
             SecurityManager security = c.Engine.Security;
             FoxTailConfig config = c.Config;
             
@@ -84,8 +85,6 @@ public class HeadlessRunner
             {
                 security.TemporarilyAllowOSC_Receiver(port);
             }
-
-            return Task.CompletedTask;
         }, _context);
         this._context.Logger.LogInfo(ResoCategory.Runner, "Allowed all hosts!");
     }

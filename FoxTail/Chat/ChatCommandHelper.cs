@@ -242,6 +242,8 @@ public class ChatCommandHelper
                     break;
                 }
                 case "gc":
+                {
+                    // restrict to those who know what this means
                     if (user.UserId != "U-1XNdZruECCu" && user.UserId != "U-1YIjc7KyPL6")
                     {
                         await Deny();
@@ -254,6 +256,43 @@ public class ChatCommandHelper
                     sw.Stop();
                     await Reply($"Garbage collection took {sw.ElapsedMilliseconds}.");
                     break;
+                }
+                case "allowurl":
+                {
+                    if (!CheckPerms(user))
+                    {
+                        await Deny();
+                        break;
+                    }
+                    
+                    if (!args.MoveNext())
+                    {
+                        await Reply("I need the URL to allow.");
+                        break;
+                    }
+                    
+                    string host = messageSpan[args.Current].ToString();
+                    
+                    if (!Uri.TryCreate(host, UriKind.Absolute, out Uri? uri))
+                    {
+                        await Reply($"Couldn't allow host {host} as it's an invalid URL");
+                        break;
+                    }
+
+                    await this._context.Engine.GlobalCoroutineManager.StartTask(async s =>
+                    {
+                        await new NextUpdate();
+                        
+                        s.TemporarilyAllowHTTP(uri.Host);
+                        s.TemporarilyAllowWebsocket(uri.Host, uri.Port);
+                        s.TemporarilyAllowOSC_Sender(uri.Host, uri.Port);
+                        
+                    }, this._context.Engine.Security);
+
+                    await Reply("Host successfully allowed.");
+                    
+                    break;
+                }
                 default:
                 {
                     if (channel.IsDirect)
