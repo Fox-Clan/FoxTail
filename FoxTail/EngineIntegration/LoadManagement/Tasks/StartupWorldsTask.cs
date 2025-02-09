@@ -12,7 +12,11 @@ public class StartupWorldsTask : InitTask
         {
             FriendlyName = "eepy world",
             URIs = [new Uri("resrec:///G-1UXaEEXzaEa/R-c061f0ff-dd34-41d4-9349-e8b3aed6b487")],
+            #if DEBUG
             InviteUsernames = ["jvyden"],
+            #else
+            InviteUsernames = ["jvyden","Lyris","TheGuppy525","stephblackcat"],
+            #endif
             InviteMessage = "<color=red>EEPY TIME!!!!!!!!</color>",
             HideFromListing = false,
         },
