@@ -9,7 +9,7 @@ namespace FoxTail;
 
 #nullable disable
 
-public class HeadlessContext
+public class HeadlessContext : IDisposable
 {
     public static Harmony Harmony;
 
@@ -22,4 +22,10 @@ public class HeadlessContext
     public StandaloneSystemInfo SystemInfo;
     
     public ChatCommandHelper CommandHelper;
+
+    public void Dispose()
+    {
+        Logger?.Dispose();
+        Engine?.Dispose();
+    }
 }

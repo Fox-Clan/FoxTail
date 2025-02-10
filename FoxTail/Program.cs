@@ -15,12 +15,14 @@ internal static class Program
 
     public static HeadlessContext Context;
     
-    public static async Task Main(string[] args)
+    public static async Task Main()
     {
         ConsoleColor oldColor = Console.ForegroundColor;
         Console.ForegroundColor = ConsoleColor.Magenta;
         Console.WriteLine("FoxTail for Resonite");
         Console.ForegroundColor = oldColor;
+        
+        AppDomain.CurrentDomain.UnhandledException += UnhandledException;
 
         Context = new HeadlessContext();
         Context.Logger = new Logger(new LoggerConfiguration
@@ -69,5 +71,27 @@ internal static class Program
         await Runner.StartFullInitTasksAsync();
 
         await Task.Delay(-1);
+    }
+
+    private static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("UNHANDLED EXCEPTION!!!");
+        Console.WriteLine("UNHANDLED EXCEPTION!!!");
+        Console.WriteLine("UNHANDLED EXCEPTION!!!");
+        
+        Console.WriteLine("CAUGHT: " + e.ExceptionObject);
+        Console.WriteLine("TERMINATING: " + e.IsTerminating);
+        
+        Console.Out.Flush();
+        try
+        {
+            Context.Dispose();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("CONTEXT DISPOSE FAILED:");
+            Console.WriteLine(ex);
+        }
     }
 }
