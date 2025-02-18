@@ -192,6 +192,7 @@ public class ChatCommandHelper
                         break;
                     }
 
+                    await Reply("Saving world...");
                     await Userspace.SaveWorldAuto(world, SaveType.Overwrite, false);
                     await Reply("World saved and overwritten.");
                     break;
