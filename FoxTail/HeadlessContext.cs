@@ -20,7 +20,7 @@ public class HeadlessContext : IDisposable
     
     public Logger Logger;
     public Engine Engine;
-    public StandaloneSystemInfo SystemInfo;
+    public FoxSystemInfo SystemInfo;
     
     public ChatCommandHelper CommandHelper;
 

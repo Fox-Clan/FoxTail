@@ -23,11 +23,13 @@
       <ResoniteReference Include="SkyFrost.Base"/>
       <ResoniteReference Include="SkyFrost.Base.Models"/>
       <ResoniteReference Include="Elements.Core"/>
+      <ResoniteReference Include="Elements.Assets"/>
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="Discord.Net.Rest" Version="3.17.1" />
       <PackageReference Include="Discord.Net.WebSocket" Version="3.17.1" />
+      <PackageReference Include="Hardware.Info" Version="101.0.1" />
       <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
       <PackageReference Include="Lib.Harmony" Version="2.3.5" />
       <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.1" />

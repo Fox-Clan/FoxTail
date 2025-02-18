@@ -11,4 +11,6 @@ public class FoxTailConfig
     public IEnumerable<string> AllowedWebsocketHosts { get; set; } = [];
     public IEnumerable<string> AllowedOSCSenderHosts { get; set; } = [];
     public IEnumerable<int> AllowedOSCReceiverPorts { get; set; } = [];
+
+    public bool LogUpdatesPerSecond { get; set; } = false;
 }

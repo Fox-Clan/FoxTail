@@ -20,7 +20,7 @@ public class HeadlessRunner
         ResoniteDllResolver.Initialize();
         
         context.Engine = new Engine();
-        context.SystemInfo = new StandaloneSystemInfo();
+        context.SystemInfo = new FoxSystemInfo(context);
         this._progress = new LoggerEngineInitProgress(context);
         this._progress.SetFixedPhase("Waiting for Initialization");
         
