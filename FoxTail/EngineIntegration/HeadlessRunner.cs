@@ -9,6 +9,9 @@ public class HeadlessRunner
 {
     private readonly HeadlessContext _context;
     private readonly LoggerEngineInitProgress _progress;
+    
+    public bool ExitComplete { get; private set; }
+    private bool _exitRequested = false;
 
     private float TickRate => _context.Config.TickRate;
     
@@ -29,6 +32,11 @@ public class HeadlessRunner
                                                                  "Tick timings will be imprecise/jittery.");
         
         this._context.Logger.LogTrace(ResoCategory.Runner, $"Stopwatch precision: {Stopwatch.Frequency}hz");
+
+        context.Engine.EnvironmentShutdownCallback = () =>
+        {
+            this.ExitComplete = true;
+        };
     }
 
     public async Task InitializeEngineAsync()
@@ -142,7 +150,7 @@ public class HeadlessRunner
         
         this._dspStartTime = DateTime.UtcNow;
 
-        while (true)
+        while (!ExitComplete)
         {
             sw.Restart();
             try
@@ -157,6 +165,7 @@ public class HeadlessRunner
                 if (shouldCrash)
                 {
                     this._context.Logger.LogError(ResoCategory.Runner, "Too many exceptions in a short period of time, crashing.");
+                    this.Exit();
                     throw;
                 }
             }
@@ -185,6 +194,11 @@ public class HeadlessRunner
             this._dspTime = (this._dspTime - 1024.0f) % 1024.0f;
             DummyAudioConnector.UpdateCallback((DateTimeOffset.UtcNow - this._dspStartTime).TotalMilliseconds * 1000);
         }
+
+        if (this._exitRequested)
+        {
+            Userspace.ExitApp(false);
+        }
     }
 
     public async Task StartFullInitTasksAsync()
@@ -195,5 +209,10 @@ public class HeadlessRunner
         await theLoader.DoAllTasksAsync();
         this._context.Logger.LogInfo(ResoCategory.EngineInit, "Full init tasks complete!");
         this._progress.SetFixedPhase("Awaiting EngineReady");
+    }
+
+    public void Exit()
+    {
+        this._exitRequested = true;
     }
 }

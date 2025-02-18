@@ -194,8 +194,10 @@ public class ChatCommandHelper
                 }
                 case "promote":
                 case "admin":
+                {
                     await ReceiveCommand(channel, user, "!role admin");
                     break;
+                }
                 case "role":
                 {
                     if (!CheckPerms(user))
@@ -287,6 +289,18 @@ public class ChatCommandHelper
 
                     await Reply("Host successfully allowed.");
                     
+                    break;
+                }
+                case "shutdown":
+                {
+                    if (!CheckPerms(user))
+                    {
+                        await Deny();
+                        break;
+                    }
+
+                    await Reply("Shutting down!");
+                    _context.Runner.Exit();
                     break;
                 }
                 default:

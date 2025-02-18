@@ -68,10 +68,12 @@ internal static class Program
 
         Runner = new HeadlessRunner(Context);
         await Runner.InitializeEngineAsync();
-        
         await Runner.StartFullInitTasksAsync();
 
-        await Task.Delay(-1);
+        while (!Runner.ExitComplete)
+        {
+            await Task.Delay(1000);
+        }
     }
 
     private static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
