@@ -14,6 +14,7 @@ public class HeadlessContext : IDisposable
     public static Harmony Harmony;
 
     public FoxTailConfig Config;
+    public WorldConfig WorldConfig;
 
     public HeadlessRunner Runner;
     

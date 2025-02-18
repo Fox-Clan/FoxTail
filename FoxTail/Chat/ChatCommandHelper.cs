@@ -1,6 +1,7 @@
 ﻿using System.Collections.Frozen;
 using System.Diagnostics;
 using FoxTail.Chat.Resonite;
+using FoxTail.Configuration;
 using FrooxEngine;
 using SkyFrost.Base;
 using User = FrooxEngine.User;
@@ -120,15 +121,9 @@ public class ChatCommandHelper
 
                     string urlStr = messageSpan[args.Current].ToString();
 
-                    urlStr = urlStr switch
-                    {
-                        "eepy" => "resrec:///G-1UXaEEXzaEa/R-c061f0ff-dd34-41d4-9349-e8b3aed6b487",
-                        "cuddly" => "resrec:///U-AlphaNeon/R-b4a66dd6-b7da-424a-9538-0207cbb8cc59",
-                        "selfstudy" => "resrec:///G-1UXaEEXzaEa/R-42bbb839-2f3e-45bc-884b-4932e0acc201",
-                        "classroom" => "resrec:///G-1UXaEEXzaEa/R-c61252d9-333f-45f7-ae0b-2961fe58ddaf",
-                        "sgc" => "resrec:///G-1UXaEEXzaEa/R-0ece8266-41ef-4837-8e2a-3249e858bc34",
-                        _ => urlStr,
-                    };
+                    string? knownUrlStr = _context.WorldConfig.GetKnownWorldUrlById(urlStr);
+                    if (knownUrlStr != null)
+                        urlStr = knownUrlStr;
                     
                     await Reply("Starting that world for you, expect an invite shortly!");
                     WorldStartSettings startInfo = new()

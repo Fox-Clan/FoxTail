@@ -6,27 +6,11 @@ namespace FoxTail.EngineIntegration.LoadManagement.Tasks;
 
 public class StartupWorldsTask : InitTask
 {
-    private readonly List<FoxWorldStartSettings> _worlds =
-    [
-        new()
-        {
-            FriendlyName = "eepy world",
-            URIs = [new Uri("resrec:///G-1UXaEEXzaEa/R-c061f0ff-dd34-41d4-9349-e8b3aed6b487")],
-            #if DEBUG
-            InviteUsernames = ["jvyden"],
-            #else
-            InviteUsernames = ["jvyden","Lyris","TheGuppy525","stephblackcat"],
-            #endif
-            InviteMessage = "<color=red>EEPY TIME!!!!!!!!</color>",
-            HideFromListing = false,
-        },
-    ];
-    
     public override string Name => "Default World Startup";
     public override InitTaskStage Stage => InitTaskStage.Authenticated;
     public override async Task ExecuteAsync(HeadlessContext context)
     {
-        foreach (FoxWorldStartSettings worldConfig in this._worlds)
+        foreach (FoxWorldStartSettings worldConfig in context.WorldConfig.CompileAutoLoadWorlds())
         {
             worldConfig.CreateLoadIndicator = false;
             
@@ -44,7 +28,7 @@ public class StartupWorldsTask : InitTask
                 while (!world.SessionURLs.Any())
                     await new NextUpdate();
                 
-                context.Logger.LogDebug(ResoCategory.WorldInit, "World is up and advertising!");
+                context.Logger.LogInfo(ResoCategory.WorldInit, "World is up and advertising!");
                 foreach (string inviteUsername in worldConfig.InviteUsernames)
                 {
                     context.Logger.LogInfo(ResoCategory.WorldInit, $"Inviting {inviteUsername} to {world.Name}");
@@ -73,6 +57,5 @@ public class StartupWorldsTask : InitTask
         }
         
         context.Logger.LogInfo(ResoCategory.WorldInit, "All worlds successfully started!");
-        this._worlds.Clear();
     }
 }
