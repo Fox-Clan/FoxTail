@@ -27,6 +27,8 @@ public class HeadlessRunner
         if(!Stopwatch.IsHighResolution)
             this._context.Logger.LogWarning(ResoCategory.Runner, "Stopwatch does not support high resolutions on this platform." +
                                                                  "Tick timings will be imprecise/jittery.");
+        
+        this._context.Logger.LogTrace(ResoCategory.Runner, $"Stopwatch precision: {Stopwatch.Frequency}hz");
     }
 
     public async Task InitializeEngineAsync()
@@ -142,6 +144,7 @@ public class HeadlessRunner
 
         while (true)
         {
+            sw.Restart();
             try
             {
                 EngineTick();
@@ -149,9 +152,17 @@ public class HeadlessRunner
             catch (Exception e)
             {
                 this._context.Logger.LogError(ResoCategory.Runner, "Error in engine update: {0}", e);
+                bool shouldCrash = this._context.SystemInfo.HandleException();
+
+                if (shouldCrash)
+                {
+                    this._context.Logger.LogError(ResoCategory.Runner, "Too many exceptions in a short period of time, crashing.");
+                    throw;
+                }
             }
 
             long requiredTicks = (long)(1000d / this.TickRate * TimeSpan.TicksPerMillisecond);
+            requiredTicks -= sw.ElapsedTicks; // try to prevent drift
             sw.Restart();
             SpinWait.SpinUntil(() => sw.ElapsedTicks >= requiredTicks);
         }

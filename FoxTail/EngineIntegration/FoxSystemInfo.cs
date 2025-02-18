@@ -83,17 +83,44 @@ public class FoxSystemInfo : ISystemInfo
     private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
     private int _frames;
 
+    /// <summary>
+    /// How many exceptions we can handle before crashing
+    /// </summary>
+    private const int MaxLives = 3;
+    /// <summary>
+    /// How many lives we have remaining
+    /// </summary>
+    private int _lives = MaxLives;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>True if we should crash. False if we can try to resume again</returns>
+    public bool HandleException()
+    {
+        _lives--;
+        if (_lives <= 0)
+            return true;
+
+        return false;
+    }
+
     public void FrameFinished()
     {
         ++this._frames;
         
         if (this._stopwatch.Elapsed.TotalSeconds < 1.0)
             return;
+
+        // rest of function runs every second rather than every frame
         
         this.FPS = this._frames / (float) this._stopwatch.Elapsed.TotalSeconds;
         
         this._stopwatch.Restart();
         this._frames = 0;
+
+        if (_lives < MaxLives)
+            _lives++;
         
         if(_context.Config.LogUpdatesPerSecond)
             this._context.Logger.LogDebug(ResoCategory.Runner, $"Engine UPS: {FPS:N2}");
