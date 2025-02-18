@@ -31,7 +31,7 @@ internal static class Program
 #if DEBUG
             MaxLevel = LogLevel.Trace,
 #else
-            MaxLevel = LogLevel.Info
+            MaxLevel = LogLevel.Debug
 #endif
         });
         
