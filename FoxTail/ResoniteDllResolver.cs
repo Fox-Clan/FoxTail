@@ -20,15 +20,36 @@ internal static class ResoniteDllResolver
 
     private static IntPtr ResolveNativeAssembly(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
     {
-        // Console.Write($"NATIVE LOAD: {libraryName} (from {assembly.FullName}) (sp: {searchPath}) = ");
+        // string log = $"NATIVE LOAD: {libraryName} (from {assembly.FullName}) (sp: {searchPath}) = ";
+        IntPtr ret = 0;
         try
         {
-            return NativeLibrary.Load(libraryName, assembly, searchPath);
+            ret = NativeLibrary.Load(libraryName, assembly, searchPath);
         }
         catch (DllNotFoundException)
         {
-            return NativeLibrary.Load(@"D:\headless\Headless\" + libraryName);
+            string? headlessPath = Environment.GetEnvironmentVariable("HEADLESS_RUNTIMES_PATH");
+            bool hadPath = headlessPath != null;
+
+            headlessPath ??= "runtimes";
+
+            try
+            {
+                string path = Path.Join(headlessPath, RuntimeInformation.RuntimeIdentifier, "native", libraryName);
+                ret = NativeLibrary.Load(path);
+            }
+            catch (DllNotFoundException)
+            {
+                if(!hadPath)
+                    throw new DllNotFoundException($"Could not find the native library '{libraryName}'. " +
+                                                   $"Try setting the HEADLESS_RUNTIMES_PATH environment variable to the location of the headless 'runtimes' folder.");
+            }
         }
+        
+        // log += $"0x{ret:X8}";
+        // Console.WriteLine(log);
+
+        return ret;
     }
 
     private static Assembly? ResolveAssembly(object? sender, ResolveEventArgs args)
