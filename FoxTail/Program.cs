@@ -67,6 +67,9 @@ internal static class Program
         };
 
         Runner = new HeadlessRunner(Context);
+
+        Context.Runner = Runner;
+        
         await Runner.InitializeEngineAsync();
         await Runner.StartFullInitTasksAsync();
 
