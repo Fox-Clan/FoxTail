@@ -4,11 +4,11 @@ namespace FoxTail.Chat.Resonite;
 
 public class ResoniteChatUser : IChatUser
 {
-    public ResoniteChatUser(IChatPlatform platform, CloudResult<User> user)
+    public ResoniteChatUser(IChatPlatform platform, User user)
     {
         this.Platform = platform;
-        this.Username = user.Entity.Username;
-        this.UserId = user.Entity.Id;
+        this.Username = user.Username;
+        this.UserId = user.Id;
     }
 
     public string Username { get; }

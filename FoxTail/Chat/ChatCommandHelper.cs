@@ -16,6 +16,7 @@ public class ChatCommandHelper
 
     private readonly FrozenSet<string> _approvedUserIds = new List<string>
     {
+        "console",
         // Discord
         "956347815267827713", // jvyden
         "329085556791443459", // beyley

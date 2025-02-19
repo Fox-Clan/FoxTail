@@ -1,4 +1,5 @@
 ﻿using FoxTail.Chat;
+using FoxTail.Chat.Console;
 using FoxTail.Chat.Discord;
 using FoxTail.Chat.Resonite;
 
@@ -12,11 +13,14 @@ public class InitializeChatTask : InitTask
     {
         context.Logger.LogDebug(ResoCategory.Chat, "Initializing chat...");
         ChatCommandHelper chat = new(context);
+        
+        // always initialize console chat.
+        chat.AddPlatform(new ConsoleChatPlatform(context));
 
         if (context.Config.DisableChatInitialization)
         {
             context.Logger.LogWarning(ResoCategory.Chat, "Skipping chat initialization as the option for it was enabled in the configuration. " +
-                                                         "Chat commands will NOT work.");
+                                                         "Chat commands will NOT work (except under console).");
             return;
         }
 
