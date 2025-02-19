@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using FoxTail.Configuration;
 using FoxTail.EngineIntegration.LoadManagement;
+using FoxTail.Timing;
 using FrooxEngine;
 
 namespace FoxTail.EngineIntegration;
@@ -9,6 +10,8 @@ public class HeadlessRunner
 {
     private readonly HeadlessContext _context;
     private readonly LoggerEngineInitProgress _progress;
+
+    private readonly ThrottledClock _clock;
     
     public bool ExitComplete { get; private set; }
     private bool _exitRequested = false;
@@ -22,8 +25,10 @@ public class HeadlessRunner
         
         ResoniteDllResolver.Initialize();
         
+        this._clock = new ThrottledClock();
+        
         context.Engine = new Engine();
-        context.SystemInfo = new FoxSystemInfo(context);
+        context.SystemInfo = new FoxSystemInfo(context, this._clock);
         this._progress = new LoggerEngineInitProgress(context);
         this._progress.SetFixedPhase("Waiting for Initialization");
         
@@ -145,14 +150,10 @@ public class HeadlessRunner
 
     private void EnterEngineLoop()
     {
-        Stopwatch sw = new();
-        sw.Start();
-        
         this._dspStartTime = DateTime.UtcNow;
 
         while (!ExitComplete)
         {
-            sw.Restart();
             try
             {
                 EngineTick();
@@ -170,10 +171,7 @@ public class HeadlessRunner
                 }
             }
 
-            long requiredTicks = (long)(1000d / this.TickRate * TimeSpan.TicksPerMillisecond);
-            requiredTicks -= sw.ElapsedTicks; // try to prevent drift
-            sw.Restart();
-            SpinWait.SpinUntil(() => sw.ElapsedTicks >= requiredTicks);
+            this._clock.Wait();
         }
     }
 

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Elements.Assets;
+using FoxTail.Timing;
 using FrooxEngine;
 using Hardware.Info;
 
@@ -8,11 +9,13 @@ namespace FoxTail.EngineIntegration;
 
 public class FoxSystemInfo : ISystemInfo
 {
-    private HeadlessContext _context;
+    private readonly HeadlessContext _context;
+    private readonly ThrottledClock _clock;
     
-    public FoxSystemInfo(HeadlessContext context)
+    public FoxSystemInfo(HeadlessContext context, ThrottledClock clock)
     {
         this._context = context;
+        this._clock = clock;
         
         HardwareInfo info = new();
         info.RefreshOperatingSystem();
@@ -81,7 +84,6 @@ public class FoxSystemInfo : ISystemInfo
     public float ExternalUpdateTime => 0;
     
     private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
-    private int _frames;
 
     /// <summary>
     /// How many exceptions we can handle before crashing
@@ -99,25 +101,19 @@ public class FoxSystemInfo : ISystemInfo
     public bool HandleException()
     {
         _lives--;
-        if (_lives <= 0)
-            return true;
-
-        return false;
+        return _lives <= 0;
     }
 
     public void FrameFinished()
     {
-        ++this._frames;
+        this.FPS = this._clock.FramesPerSecond;
         
         if (this._stopwatch.Elapsed.TotalSeconds < 1.0)
             return;
 
         // rest of function runs every second rather than every frame
         
-        this.FPS = this._frames / (float) this._stopwatch.Elapsed.TotalSeconds;
-        
         this._stopwatch.Restart();
-        this._frames = 0;
 
         if (_lives < MaxLives)
             _lives++;

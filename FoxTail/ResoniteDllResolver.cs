@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Net;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace FoxTail;
