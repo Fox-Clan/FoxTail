@@ -14,6 +14,8 @@ public class InitializeChatTask : InitTask
         context.Logger.LogDebug(ResoCategory.Chat, "Initializing chat...");
         ChatCommandHelper chat = new(context);
         
+        context.CommandHelper = chat;
+        
         // always initialize console chat.
         chat.AddPlatform(new ConsoleChatPlatform(context));
 
@@ -39,7 +41,5 @@ public class InitializeChatTask : InitTask
             
             chat.AddPlatform(discord);
         }
-
-        context.CommandHelper = chat;
     }
 }
