@@ -13,6 +13,13 @@ public class InitializeChatTask : InitTask
         context.Logger.LogDebug(ResoCategory.Chat, "Initializing chat...");
         ChatCommandHelper chat = new(context);
 
+        if (context.Config.DisableChatInitialization)
+        {
+            context.Logger.LogWarning(ResoCategory.Chat, "Skipping chat initialization as the option for it was enabled in the configuration. " +
+                                                         "Chat commands will NOT work.");
+            return;
+        }
+
         chat.AddPlatform(new ResoniteChatPlatform(context));
         
         context.Logger.LogDebug(ResoCategory.Chat, "Initializing Discord integrations...");
