@@ -33,6 +33,9 @@ public class ConsoleChatPlatform : IChatPlatform, IDisposable
                     Id = "console",
                 });
 
+                if (!line.StartsWith('!'))
+                    line = '!' + line;
+
                 _context.CommandHelper.ReceiveCommand(channel, user, line).Wait();
             }
         });
