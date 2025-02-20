@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Elements.Core;
 using FoxTail.Configuration;
 using FoxTail.EngineIntegration.LoadManagement;
 using FoxTail.Timing;
@@ -12,6 +13,14 @@ public class HeadlessRunner
     private readonly LoggerEngineInitProgress _progress;
 
     private readonly ThrottledClock _clock;
+
+    private readonly string[] _requiredDirectories =
+        [
+            "Data",
+            "Cache",
+            "Logs",
+            "RuntimeData",
+        ];
     
     public bool ExitComplete { get; private set; }
     private bool _exitRequested = false;
@@ -49,6 +58,13 @@ public class HeadlessRunner
         this._context.Logger.LogInfo(ResoCategory.Runner, "Initializing FrooxEngine...");
 
         string path = Environment.CurrentDirectory;
+        
+        foreach (string dir in this._requiredDirectories)
+        {
+            string dirPath = Path.Combine(path, dir);
+            if (!Directory.Exists(dirPath))
+                Directory.CreateDirectory(dirPath);
+        }
 
         LaunchOptions options = new()
         {
@@ -62,7 +78,7 @@ public class HeadlessRunner
             VerboseInit = false,
             #endif
             DoNotAutoLoadHome = true,
-            DisablePlatformInterfaces = true
+            DisablePlatformInterfaces = true,
         };
         
         Stopwatch sw = Stopwatch.StartNew(); 
