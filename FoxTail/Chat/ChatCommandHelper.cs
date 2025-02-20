@@ -262,7 +262,7 @@ public class ChatCommandHelper : IDisposable
                     Stopwatch sw = Stopwatch.StartNew();
                     GC.Collect();
                     sw.Stop();
-                    await Reply($"Garbage collection took {sw.ElapsedMilliseconds}.");
+                    await Reply($"Garbage collection took {sw.ElapsedMilliseconds}ms.");
                     break;
                 }
                 case "allowurl":
