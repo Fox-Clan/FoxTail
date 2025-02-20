@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.Loader;
 using Elements.Core;
 using FoxTail.Configuration;
 using FoxTail.EngineIntegration;
@@ -68,15 +69,16 @@ internal static class Program
 
         Runner = new HeadlessRunner(Context);
 
+        AppDomain.CurrentDomain.ProcessExit += (_, _) => OnProgramExiting();
+        Console.CancelKeyPress += (_, _) => OnProgramExiting();
+
         Context.Runner = Runner;
         
         await Runner.InitializeEngineAsync();
         await Runner.StartFullInitTasksAsync();
 
-        while (!Runner.ExitComplete)
-        {
-            await Task.Delay(1000);
-        }
+        // this blocks the thread until the engine exits.
+        await Runner.WaitForEngineExitAsync();
         
         Context.Dispose();
     }
@@ -101,5 +103,13 @@ internal static class Program
             Console.WriteLine("CONTEXT DISPOSE FAILED:");
             Console.WriteLine(ex);
         }
+    }
+
+    private static void OnProgramExiting()
+    {
+        Context.Logger.LogInfo(ResoCategory.Runner, "Exit has been requested by the host, beginning shutdown process.");
+        Runner.Exit();
+        Runner.WaitForEngineExit();
+        Context.Dispose();
     }
 }

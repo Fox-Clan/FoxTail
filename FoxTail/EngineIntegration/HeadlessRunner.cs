@@ -228,9 +228,29 @@ public class HeadlessRunner
         this._progress.SetFixedPhase("Awaiting EngineReady");
     }
 
-    public void Exit()
+    public bool Exit()
     {
-        this._context.Logger.LogInfo(ResoCategory.Runner, "Exit has been requested.");
+        if (this._exitRequested)
+            return false;
+        
+        this._context.Logger.LogDebug(ResoCategory.Runner, "Signalling exit request...");
         this._exitRequested = true;
+        return true;
+    }
+
+    public async Task WaitForEngineExitAsync()
+    {
+        while (!this.ExitComplete)
+        {
+            await Task.Delay(1000);
+        }
+    }
+    
+    public void WaitForEngineExit()
+    {
+        while (!this.ExitComplete)
+        {
+            Thread.Sleep(25);
+        }
     }
 }

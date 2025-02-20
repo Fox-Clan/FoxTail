@@ -24,8 +24,14 @@ public class HeadlessContext : IDisposable
     
     public ChatCommandHelper CommandHelper;
 
+    private bool _disposed;
+
     public void Dispose()
     {
+        if (_disposed)
+            return;
+        
+        _disposed = true;
         Logger.LogInfo(ResoCategory.Runner, "Disposing HeadlessContext.");
         
         Logger?.Dispose();
