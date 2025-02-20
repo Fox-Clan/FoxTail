@@ -82,7 +82,7 @@ public class DiscordChatPlatform : IChatPlatform, IDisposable
         DiscordChatChannel channel = new(this, message.Channel);
         DiscordChatUser user = new(this, message.Author);
 
-        await this._context.CommandHelper.ReceiveCommand(channel, user, message.Content);
+        await Task.Run(async () => await this._context.CommandHelper.ReceiveCommand(channel, user, message.Content));
     }
 
     private string _lastCustomStatus = "";
