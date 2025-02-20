@@ -42,7 +42,6 @@ internal static class Program
         
         Context.Logger.LogInfo(ResoCategory.Harmony, "Initializing Harmony...");
         HeadlessContext.Harmony = new Harmony(nameof(FoxTail));
-        Harmony.DEBUG = true;
         Stopwatch sw = Stopwatch.StartNew();
         HeadlessContext.Harmony.PatchAll();
         Context.Logger.LogInfo(ResoCategory.Harmony, $"Harmony patches took {sw.ElapsedMilliseconds}ms.");
