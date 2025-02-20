@@ -313,6 +313,50 @@ public class ChatCommandHelper : IDisposable
                     _context.Runner.Exit();
                     break;
                 }
+                case "friend":
+                {
+                    if (!CheckPerms(user))
+                    {
+                        await Deny();
+                        break;
+                    }
+                    
+                    if (!args.MoveNext())
+                    {
+                        await Reply("I need the username of the friend to add.");
+                        break;
+                    }
+                    
+                    string friendName = messageSpan[args.Current].ToString();
+                    SkyFrost.Base.User? cloudUser = (await _context.Engine.Cloud.Users.GetUserByName(friendName)).Entity;
+
+                    if (cloudUser == null)
+                    {
+                        await Reply("I couldn't find that user.");
+                        break;
+                    }
+                    
+                    Contact? contact = _context.Engine.Cloud.Contacts.GetContact(cloudUser.Id);
+                    if (contact != null && contact.ContactStatus == ContactStatus.Requested)
+                    {
+                        await _context.Engine.Cloud.Contacts.AddContact(contact);
+                        await Reply("Request accepted!");
+                    }
+                    else if(contact?.ContactStatus != ContactStatus.Accepted)
+                    {
+                        await _context.Engine.Cloud.Contacts.AddContact(cloudUser.Id, cloudUser.Username);
+                        await Reply("Sent a request.");
+                    }
+                    else if (contact.ContactStatus == ContactStatus.Accepted)
+                    {
+                        await Reply("I already have that person as friends.");
+                    }
+                    else
+                    {
+                        await Reply($"you did something impossible. contact:{contact} status:{contact.ContactStatus} user:{cloudUser}");
+                    }
+                    break;
+                }
                 default:
                 {
                     if (channel.IsDirect)
