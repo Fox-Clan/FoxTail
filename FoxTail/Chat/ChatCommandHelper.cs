@@ -124,12 +124,19 @@ public class ChatCommandHelper : IDisposable
                     string? knownUrlStr = _context.WorldConfig.GetKnownWorldUrlById(urlStr);
                     if (knownUrlStr != null)
                         urlStr = knownUrlStr;
+
+                    bool urlValid = Uri.TryCreate(urlStr, UriKind.Absolute, out Uri? uri);
+                    if (!urlValid || uri == null)
+                    {
+                        await Reply("I couldn't find that world alias. Try providing the record URL instead.");
+                        break;
+                    }
                     
                     await Reply("Starting that world for you, expect an invite shortly!");
                     WorldStartSettings startInfo = new()
                     {
                         URIs = [
-                            new Uri(urlStr),
+                            uri
                         ],
                         CreateLoadIndicator = false,
                         HideFromListing = false,
