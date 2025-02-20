@@ -7,7 +7,7 @@ using UserStatus = Discord.UserStatus;
 
 namespace FoxTail.Chat.Discord;
 
-public class DiscordChatPlatform : IChatPlatform
+public class DiscordChatPlatform : IChatPlatform, IDisposable
 {
     private readonly HeadlessContext _context;
     private readonly DiscordSocketClient _client;
@@ -110,5 +110,11 @@ public class DiscordChatPlatform : IChatPlatform
             await this._client.SetCustomStatusAsync(customStatus);
             this._lastCustomStatus = customStatus;
         }
+    }
+
+    public void Dispose()
+    {
+        _client.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

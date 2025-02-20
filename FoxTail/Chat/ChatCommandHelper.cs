@@ -1,14 +1,13 @@
 ﻿using System.Collections.Frozen;
 using System.Diagnostics;
 using FoxTail.Chat.Resonite;
-using FoxTail.Configuration;
 using FrooxEngine;
 using SkyFrost.Base;
 using User = FrooxEngine.User;
 
 namespace FoxTail.Chat;
 
-public class ChatCommandHelper
+public class ChatCommandHelper : IDisposable
 {
     private readonly HeadlessContext _context;
 
@@ -339,5 +338,16 @@ public class ChatCommandHelper
             
             await channel.Platform.SendInviteAsync(channel, world);
         }
+    }
+
+    public void Dispose()
+    {
+        foreach (IChatPlatform chatPlatform in this._platforms)
+        {
+            if(chatPlatform is IDisposable disposable)
+                disposable.Dispose();
+        }
+        
+        GC.SuppressFinalize(this);
     }
 }

@@ -49,6 +49,7 @@ public class HeadlessRunner
 
         context.Engine.EnvironmentShutdownCallback = () =>
         {
+            context.Logger.LogInfo(ResoCategory.Runner, "Environment has shutdown. Exit is complete!");
             this.ExitComplete = true;
         };
     }
@@ -189,6 +190,8 @@ public class HeadlessRunner
 
             this._clock.Wait();
         }
+        
+        this._context.Logger.LogInfo(ResoCategory.Runner, "Engine thread exiting!");
     }
 
     private void EngineTick()
@@ -227,6 +230,7 @@ public class HeadlessRunner
 
     public void Exit()
     {
+        this._context.Logger.LogInfo(ResoCategory.Runner, "Exit has been requested.");
         this._exitRequested = true;
     }
 }

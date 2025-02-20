@@ -26,7 +26,10 @@ public class HeadlessContext : IDisposable
 
     public void Dispose()
     {
+        Logger.LogInfo(ResoCategory.Runner, "Disposing HeadlessContext.");
+        
         Logger?.Dispose();
         Engine?.Dispose();
+        CommandHelper?.Dispose();
     }
 }

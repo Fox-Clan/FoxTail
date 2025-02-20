@@ -77,6 +77,8 @@ internal static class Program
         {
             await Task.Delay(1000);
         }
+        
+        Context.Dispose();
     }
 
     private static void UnhandledException(object sender, UnhandledExceptionEventArgs e)

@@ -8,18 +8,17 @@ namespace FoxTail.Chat.Console;
 public class ConsoleChatPlatform : IChatPlatform, IDisposable
 {
     private readonly HeadlessContext _context;
+    private readonly CancellationTokenSource _cts = new();
     
     public ConsoleChatPlatform(HeadlessContext context)
     {
         this._context = context;
         
-        Thread thread = new(() =>
+        Thread thread = new(async () =>
         {
-            while (!this._disposed)
+            using StreamReader reader = new(System.Console.OpenStandardInput(), System.Console.InputEncoding);
+            while (!this._disposed && await reader.ReadLineAsync(this._cts.Token) is { } line)
             {
-                string? line = System.Console.ReadLine();
-                if (line == null) break; // stop thread if no stdin
-
                 Message message = new()
                 {
                     Content = line,
@@ -36,7 +35,7 @@ public class ConsoleChatPlatform : IChatPlatform, IDisposable
                 if (!line.StartsWith('!'))
                     line = '!' + line;
 
-                _context.CommandHelper.ReceiveCommand(channel, user, line).Wait();
+                await _context.CommandHelper.ReceiveCommand(channel, user, line);
             }
         });
         thread.Name = "ConsoleChatPlatform Input Thread";
@@ -66,6 +65,7 @@ public class ConsoleChatPlatform : IChatPlatform, IDisposable
     public void Dispose()
     {
         this._disposed = true;
+        this._cts.Cancel();
         GC.SuppressFinalize(this);
     }
 }
