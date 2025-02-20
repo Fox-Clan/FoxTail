@@ -125,6 +125,9 @@ public class ChatCommandHelper : IDisposable
                     if (knownUrlStr != null)
                         urlStr = knownUrlStr;
 
+                    if (urlStr.StartsWith('h'))
+                        urlStr = urlStr.Replace("https://go.resonite.com/record", "resrec://");
+
                     bool urlValid = Uri.TryCreate(urlStr, UriKind.Absolute, out Uri? uri);
                     if (!urlValid || uri == null)
                     {
