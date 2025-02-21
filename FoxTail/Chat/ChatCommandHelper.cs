@@ -95,6 +95,7 @@ public class ChatCommandHelper : IDisposable
                     World world = await Userspace.OpenWorld(startInfo);
                     world.Name = $"Fennec Grid (opened by {user.Username})";
                     world.AccessLevel = SessionAccessLevel.Contacts;
+                    world.ForceFullUpdateCycle = true;
                     await world.Coroutines.StartTask(async () =>
                     {
                         await InviteSender(world);
@@ -147,6 +148,7 @@ public class ChatCommandHelper : IDisposable
                     
                     World world = await Userspace.OpenWorld(startInfo);
                     world.AccessLevel = SessionAccessLevel.Contacts;
+                    world.ForceFullUpdateCycle = true;
                     await world.Coroutines.StartTask(async () =>
                     {
                         await InviteSender(world);

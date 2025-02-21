@@ -17,6 +17,7 @@ public class StartupWorldsTask : InitTask
             context.Logger.LogInfo(ResoCategory.WorldInit, $"Starting world {worldConfig.FriendlyName}...");
             World world = await Userspace.OpenWorld(worldConfig);
             world.AccessLevel = worldConfig.DefaultAccessLevel ?? SessionAccessLevel.Contacts;
+            world.ForceFullUpdateCycle = true;
 
             if (worldConfig.OverrideName != null)
                 world.Name = worldConfig.OverrideName;
