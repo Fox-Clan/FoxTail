@@ -10,6 +10,8 @@ public class ManagedWorld
     public readonly IChatUser? Owner;
     public readonly uint Id;
 
+    public string Name => World.Name;
+
     internal ManagedWorld(World world, IChatUser? owner, uint id)
     {
         World = world;
@@ -72,7 +74,7 @@ public class ManagedWorld
 
     public override string ToString()
     {
-        return $"ManagedWorld {Id}: '{World.Name}' (owned by: {Owner?.Username ?? "nobody"})";
+        return $"ManagedWorld {Id}: '{Name}' (owned by: {Owner?.Username ?? "nobody"})";
     }
 
     public override int GetHashCode()

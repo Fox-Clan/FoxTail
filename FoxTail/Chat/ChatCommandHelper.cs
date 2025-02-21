@@ -41,15 +41,6 @@ public class ChatCommandHelper : IDisposable
         _platforms.Add(platform);
     }
 
-    public World? GetWorldUserIn(IChatUser user)
-    {
-        if (user is not ResoniteChatUser)
-            return null;
-
-        return this._context.Engine.WorldManager.Worlds
-            .FirstOrDefault(w => w.AllUsers.FirstOrDefault(u => u.UserID == user.UserId && u.IsPresentInWorld) != null);
-    }
-
     public async Task ReceiveCommand(IChatChannel channel, IChatUser user, string message)
     {
         this._context.Logger.LogDebug(ResoCategory.Chat, $"[{channel.Platform.Name}/#{channel.Name}] {user.Username}: {message}");
@@ -141,14 +132,14 @@ public class ChatCommandHelper : IDisposable
                         break;
                     }
                     
-                    World? world = GetWorldUserIn(user);
+                    ManagedWorld? world = this._context.WorldManager.FindWorldUserIn(user);
                     if (world == null)
                     {
                         await Reply("I couldn't find the world you were in, so I can't close it. Try joining/focusing the world.");
                         break;
                     }
                     
-                    world.Destroy();
+                    this._context.WorldManager.CloseWorld(world);
                     await Reply("Closed " + world.Name + ".");
                     break;
                 }
@@ -160,22 +151,24 @@ public class ChatCommandHelper : IDisposable
                         return;
                     }
                     
-                    World? world = GetWorldUserIn(user);
+                    ManagedWorld? world = this._context.WorldManager.FindWorldUserIn(user);
                     if (world == null)
                     {
                         await Reply("I couldn't find the world you were in, so I can't save it. Try joining/focusing the world.");
                         break;
                     }
+                    
+                    await Reply("Saving world...");
 
-                    if (!Userspace.CanSave(world))
+                    if (await this._context.WorldManager.SaveWorld(world))
+                    {
+                        await Reply("World saved and overwritten.");
+                    }
+                    else
                     {
                         await Reply("I can't save that world as I don't own that world. You can use 'Save As...' under Session to save it yourself.");
-                        break;
                     }
-
-                    await Reply("Saving world...");
-                    await Userspace.SaveWorldAuto(world, SaveType.Overwrite, false);
-                    await Reply("World saved and overwritten.");
+                    
                     break;
                 }
                 case "promote":
@@ -192,7 +185,7 @@ public class ChatCommandHelper : IDisposable
                         break;
                     }
                     
-                    World? world = GetWorldUserIn(user);
+                    ManagedWorld? world = this._context.WorldManager.FindWorldUserIn(user);
                     if (world == null)
                     {
                         await Reply("I couldn't find the world you were in, so I can't set your role. Try joining/focusing the world.");
@@ -206,7 +199,7 @@ public class ChatCommandHelper : IDisposable
                     }
 
                     string roleName = messageSpan[args.Current].ToString();
-                    PermissionSet? role = world.Permissions.Roles.
+                    PermissionSet? role = world.World.Permissions.Roles.
                         FirstOrDefault(r => r.RoleName.Value.Equals(roleName, StringComparison.InvariantCultureIgnoreCase));
 
                     if (role == null)
@@ -215,14 +208,13 @@ public class ChatCommandHelper : IDisposable
                         break;
                     }
                     
-                    User worldUser = world.GetUserByUserId(user.UserId);
+                    User worldUser = world.World.GetUserByUserId(user.UserId);
 
-                    await world.Coroutines.StartTask(async u =>
+                    world.World.RunSynchronously(() =>
                     {
-                        await new NextUpdate();
-                        u.Role = role;
-                        u.World.Permissions.AssignDefaultRole(u, role);
-                    }, worldUser);
+                        worldUser.Role = role;
+                        worldUser.World.Permissions.AssignDefaultRole(worldUser, role);
+                    });
                     break;
                 }
                 case "gc":

@@ -1,4 +1,5 @@
 ﻿using FoxTail.Chat;
+using FoxTail.Chat.Resonite;
 using FrooxEngine;
 using SkyFrost.Base;
 
@@ -12,7 +13,7 @@ public class FoxWorldManager
     private uint _idIncrement = 0;
     private uint LatestWorldId => Interlocked.Increment(ref _idIncrement);
 
-    private List<ManagedWorld> _worlds = new(1);
+    private readonly List<ManagedWorld> _worlds = new(1);
 
     public FoxWorldManager(HeadlessContext context)
     {
@@ -50,6 +51,7 @@ public class FoxWorldManager
             });
         });
 
+        this._context.Logger.LogInfo(ResoCategory.WorldManager, $"Registered world {managed}.");
         this._worlds.Add(managed);
         return managed;
     }
@@ -70,4 +72,29 @@ public class FoxWorldManager
             InitWorld = action,
             HideFromListing = false,
         }, owner);
+
+    public async Task CloseWorld(ManagedWorld world)
+    {
+        await Userspace.ExitWorld(world.World);
+        this._worlds.Remove(world);
+        this._context.Logger.LogInfo(ResoCategory.WorldManager, $"Unregistered world {world}.");
+    }
+
+    public async Task<bool> SaveWorld(ManagedWorld world)
+    {
+        if (!Userspace.CanSave(world.World) || !world.World.IsAllowedToSaveWorld())
+            return false;
+
+        await Userspace.SaveWorldAuto(world.World, SaveType.Overwrite, false);
+        return true;
+    }
+
+    public ManagedWorld? FindWorldUserIn(IChatUser user)
+    {
+        if (user is not ResoniteChatUser)
+            return null;
+
+        return this._worlds
+            .FirstOrDefault(w => w.World.AllUsers.FirstOrDefault(u => u.UserID == user.UserId && u.IsPresentInWorld) != null);
+    }
 }

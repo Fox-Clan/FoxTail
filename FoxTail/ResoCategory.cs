@@ -10,5 +10,6 @@ public enum ResoCategory : byte
     Chat,
     Discord,
     WorldInit,
+    WorldManager,
     Config,
 }
