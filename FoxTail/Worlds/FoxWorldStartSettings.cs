@@ -1,6 +1,6 @@
 ﻿using FrooxEngine;
 
-namespace FoxTail.EngineIntegration.LoadManagement;
+namespace FoxTail.Worlds;
 
 public class FoxWorldStartSettings : WorldStartSettings
 {

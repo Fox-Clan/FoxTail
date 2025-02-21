@@ -1,10 +1,9 @@
-﻿using FoxTail.EngineIntegration.LoadManagement;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using SkyFrost.Base;
 
-namespace FoxTail.Configuration;
+namespace FoxTail.Worlds;
 
 [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
 public class KnownWorld
