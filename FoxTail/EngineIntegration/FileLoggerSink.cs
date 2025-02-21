@@ -15,6 +15,8 @@ public class FileLoggerSink : ILoggerSink, IDisposable
 
         this._stream = File.OpenWrite(path);
         this._writer = new StreamWriter(this._stream);
+        
+        this._writer.WriteLine("FoxTail for Resonite");
     }
 
     public void Log(LogLevel level, ReadOnlySpan<char> category, ReadOnlySpan<char> content)
