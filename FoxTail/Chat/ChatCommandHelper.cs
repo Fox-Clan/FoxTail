@@ -91,6 +91,13 @@ public class ChatCommandHelper : IDisposable
                     await world.InviteAndPromoteOwner(channel);
                     break;
                 }
+                case "platform":
+                {
+                    await Reply("Starting a platform for you, expect an invite shortly!");
+                    ManagedWorld world = await _context.WorldManager.StartWorld(WorldPresets.SimplePlatform);
+                    await world.InviteAndPromoteOwner(channel);
+                    break;
+                }
                 case "start":
                 {
                     if (!CheckPerms(user))
