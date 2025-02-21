@@ -141,7 +141,7 @@ public class ChatCommandHelper : IDisposable
                         break;
                     }
                     
-                    this._context.WorldManager.CloseWorld(world);
+                    await this._context.WorldManager.CloseWorld(world);
                     await Reply("Closed " + world.Name + ".");
                     break;
                 }
