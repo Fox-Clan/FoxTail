@@ -45,10 +45,10 @@ public class ChatCommandHelper : IDisposable
 
     public async Task ReceiveCommand(IChatChannel channel, IChatUser user, string message)
     {
-        this._context.Logger.LogDebug(ResoCategory.Chat, $"[{channel.Platform.Name}/#{channel.Name}] {user.Username}: {message}");
-
         if (!message.StartsWith('!'))
             return;
+        
+        this._context.Logger.LogDebug(ResoCategory.Chat, $"[{channel.Platform.Name}/#{channel.Name}] {user.Username}: {message}");
 
         ReadOnlySpan<char> messageSpan = message.AsSpan()[1..];
         int firstSpace = messageSpan.IndexOf(' ');
