@@ -57,19 +57,22 @@ public class ManagedWorld
             this.World.AllowUserToJoin(this.Owner.UserId);
             while (!this.World.SessionURLs.Any())
                 await new NextUpdate();
-            
-            await channel.Platform.SendInviteAsync(channel, this.World);
+
+            _ = Task.Run(async () => await channel.Platform.SendInviteAsync(channel, this.World));
             
             while (!this.World.Permissions.PermissionHandlingInitialized)
                 await new NextUpdate();
 
-            this.World.Permissions.DefaultUserPermissions[this.Owner.UserId] = this.World.Permissions.HighestRole;
+            this.World.RunSynchronously(() =>
+            {
+                this.World.Permissions.DefaultUserPermissions[this.Owner.UserId] = this.World.Permissions.HighestRole;
+            });
         });
     }
 
     public override string ToString()
     {
-        return base.ToString();
+        return $"ManagedWorld {Id}: '{World.Name}' (owned by: {Owner?.Username ?? "nobody"})";
     }
 
     public override int GetHashCode()
