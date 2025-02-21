@@ -7,6 +7,7 @@ using FoxTail.EngineIntegration.LoadManagement.Tasks;
 using HarmonyLib;
 using NotEnoughLogs;
 using NotEnoughLogs.Behaviour;
+using NotEnoughLogs.Sinks;
 
 namespace FoxTail;
 
@@ -26,7 +27,7 @@ internal static class Program
         AppDomain.CurrentDomain.UnhandledException += UnhandledException;
 
         Context = new HeadlessContext();
-        Context.Logger = new Logger(new LoggerConfiguration
+        Context.Logger = new Logger([new ConsoleSink(), new FileLoggerSink()], new LoggerConfiguration
         {
             Behaviour = new QueueLoggingBehaviour(),
 #if DEBUG
