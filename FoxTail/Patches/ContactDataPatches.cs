@@ -4,6 +4,8 @@ using Elements.Core;
 using HarmonyLib;
 using SkyFrost.Base;
 
+// ReSharper disable all
+
 namespace FoxTail.Patches;
 
 [HarmonyPatch]

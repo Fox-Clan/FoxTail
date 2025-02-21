@@ -1,6 +1,8 @@
 ﻿using FrooxEngine;
 using HarmonyLib;
 
+// ReSharper disable all
+
 namespace FoxTail.Patches;
 
 [HarmonyPatch]

@@ -4,6 +4,8 @@ using HarmonyLib;
 using NYoutubeDL;
 using NYoutubeDL.Helpers;
 
+// ReSharper disable all
+
 namespace FoxTail.Patches;
 
 [HarmonyPatch]
