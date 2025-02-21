@@ -87,14 +87,14 @@ public class ChatCommandHelper : IDisposable
                 case "grid":
                 {
                     await Reply("Starting a grid for you, expect an invite shortly!");
-                    ManagedWorld world = await _context.WorldManager.StartWorld(WorldPresets.Grid);
+                    ManagedWorld world = await _context.WorldManager.StartWorld(WorldPresets.Grid, user);
                     await world.InviteAndPromoteOwner(channel);
                     break;
                 }
                 case "platform":
                 {
                     await Reply("Starting a platform for you, expect an invite shortly!");
-                    ManagedWorld world = await _context.WorldManager.StartWorld(WorldPresets.SimplePlatform);
+                    ManagedWorld world = await _context.WorldManager.StartWorld(WorldPresets.SimplePlatform, user);
                     await world.InviteAndPromoteOwner(channel);
                     break;
                 }
