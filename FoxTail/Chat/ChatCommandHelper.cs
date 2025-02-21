@@ -1,6 +1,7 @@
 ﻿using System.Collections.Frozen;
 using System.Diagnostics;
 using FoxTail.Chat.Resonite;
+using FoxTail.Worlds;
 using FrooxEngine;
 using SkyFrost.Base;
 using User = FrooxEngine.User;
@@ -86,24 +87,8 @@ public class ChatCommandHelper : IDisposable
                 case "grid":
                 {
                     await Reply("Starting a grid for you, expect an invite shortly!");
-                    WorldStartSettings startInfo = new()
-                    {
-                        InitWorld = WorldPresets.Grid,
-                        CreateLoadIndicator = false,
-                        HideFromListing = false,
-                    };
-                    World world = await Userspace.OpenWorld(startInfo);
-                    world.Name = $"Fennec Grid (opened by {user.Username})";
-                    world.AccessLevel = SessionAccessLevel.Contacts;
-                    world.ForceFullUpdateCycle = true;
-                    await world.Coroutines.StartTask(async () =>
-                    {
-                        await InviteSender(world);
-                        while (!world.Permissions.PermissionHandlingInitialized)
-                            await new NextUpdate();
-
-                        world.Permissions.DefaultUserPermissions[user.UserId] = world.Permissions.HighestRole;
-                    });
+                    ManagedWorld world = await _context.WorldManager.StartWorld(WorldPresets.Grid);
+                    await world.InviteAndPromoteOwner(channel);
                     break;
                 }
                 case "start":
@@ -137,26 +122,8 @@ public class ChatCommandHelper : IDisposable
                     }
                     
                     await Reply("Starting that world for you, expect an invite shortly!");
-                    WorldStartSettings startInfo = new()
-                    {
-                        URIs = [
-                            uri
-                        ],
-                        CreateLoadIndicator = false,
-                        HideFromListing = false,
-                    };
-                    
-                    World world = await Userspace.OpenWorld(startInfo);
-                    world.AccessLevel = SessionAccessLevel.Contacts;
-                    world.ForceFullUpdateCycle = true;
-                    await world.Coroutines.StartTask(async () =>
-                    {
-                        await InviteSender(world);
-                        while (!world.Permissions.PermissionHandlingInitialized)
-                            await new NextUpdate();
-
-                        world.Permissions.DefaultUserPermissions[user.UserId] = world.Permissions.HighestRole;
-                    });
+                    ManagedWorld world = await _context.WorldManager.StartWorld(uri, user);
+                    await world.InviteAndPromoteOwner(channel);
                     break;
                 }
                 case "close":
@@ -384,15 +351,6 @@ public class ChatCommandHelper : IDisposable
         Task Reply(string content)
         {
             return channel.Platform.SendMessageAsync(channel, content);
-        }
-
-        async Task InviteSender(World world)
-        {
-            world.AllowUserToJoin(user.UserId);
-            while (!world.SessionURLs.Any())
-                await new NextUpdate();
-            
-            await channel.Platform.SendInviteAsync(channel, world);
         }
     }
 

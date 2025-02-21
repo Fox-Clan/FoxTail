@@ -1,6 +1,7 @@
 ﻿using FoxTail.Chat;
 using FoxTail.Configuration;
 using FoxTail.EngineIntegration;
+using FoxTail.Worlds;
 using FrooxEngine;
 using HarmonyLib;
 using NotEnoughLogs;
@@ -23,6 +24,7 @@ public class HeadlessContext : IDisposable
     public FoxSystemInfo SystemInfo;
     
     public ChatCommandHelper CommandHelper;
+    public FoxWorldManager WorldManager;
 
     private bool _disposed;
 
