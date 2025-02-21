@@ -21,6 +21,14 @@ public class FoxWorldManager
         this._mgr = context.Engine.WorldManager;
     }
 
+    public IEnumerable<ManagedWorld> WorldsListForUser(IChatUser user)
+    {
+        if (this._context.CommandHelper.IsApproved(user))
+            return this._worlds;
+
+        return this._worlds.Where(w => w.IsVisibleForUser(user));
+    }
+
     public async Task<ManagedWorld> StartWorld(FoxWorldStartSettings settings, IChatUser? owner = null)
     {
         settings.CreateLoadIndicator = false;

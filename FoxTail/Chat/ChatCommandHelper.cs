@@ -1,5 +1,7 @@
 ﻿using System.Collections.Frozen;
 using System.Diagnostics;
+using System.Text;
+using Elements.Core;
 using FoxTail.Chat.Resonite;
 using FoxTail.Worlds;
 using FrooxEngine;
@@ -29,7 +31,7 @@ public class ChatCommandHelper : IDisposable
         "U-TheGuppy525", // guppy
     }.ToFrozenSet();
 
-    private bool CheckPerms(IChatUser user) => _approvedUserIds.Contains(user.UserId);
+    public bool IsApproved(IChatUser user) => _approvedUserIds.Contains(user.UserId);
 
     public ChatCommandHelper(HeadlessContext context)
     {
@@ -91,7 +93,7 @@ public class ChatCommandHelper : IDisposable
                 }
                 case "start":
                 {
-                    if (!CheckPerms(user))
+                    if (!IsApproved(user))
                     {
                         await Deny();
                         break;
@@ -126,7 +128,7 @@ public class ChatCommandHelper : IDisposable
                 }
                 case "close":
                 {
-                    if (!CheckPerms(user))
+                    if (!IsApproved(user))
                     {
                         await Deny();
                         break;
@@ -145,7 +147,7 @@ public class ChatCommandHelper : IDisposable
                 }
                 case "save":
                 {
-                    if (!CheckPerms(user))
+                    if (!IsApproved(user))
                     {
                         await Deny();
                         return;
@@ -179,7 +181,7 @@ public class ChatCommandHelper : IDisposable
                 }
                 case "role":
                 {
-                    if (!CheckPerms(user))
+                    if (!IsApproved(user))
                     {
                         await Deny();
                         break;
@@ -235,7 +237,7 @@ public class ChatCommandHelper : IDisposable
                 }
                 case "allowurl":
                 {
-                    if (!CheckPerms(user))
+                    if (!IsApproved(user))
                     {
                         await Deny();
                         break;
@@ -271,7 +273,7 @@ public class ChatCommandHelper : IDisposable
                 }
                 case "shutdown":
                 {
-                    if (!CheckPerms(user))
+                    if (!IsApproved(user))
                     {
                         await Deny();
                         break;
@@ -283,7 +285,7 @@ public class ChatCommandHelper : IDisposable
                 }
                 case "friend":
                 {
-                    if (!CheckPerms(user))
+                    if (!IsApproved(user))
                     {
                         await Deny();
                         break;
@@ -323,6 +325,22 @@ public class ChatCommandHelper : IDisposable
                     {
                         await Reply($"you did something impossible. contact:{contact} status:{contact.ContactStatus} user:{cloudUser}");
                     }
+                    break;
+                }
+                case "worlds":
+                {
+                    List<ManagedWorld> worlds = this._context.WorldManager.WorldsListForUser(user).ToList();
+                    StringBuilder sb = new();
+
+                    sb.Append("<b>World Listing (");
+                    sb.Append(worlds.Count);
+                    sb.AppendLine(" worlds open)</b>");
+                    foreach (ManagedWorld world in worlds)
+                    {
+                        sb.AppendLine($"ID {world.Id}: {world.Name}");
+                    }
+
+                    await Reply(sb.ToString());
                     break;
                 }
                 default:

@@ -72,6 +72,20 @@ public class ManagedWorld
         });
     }
 
+    public bool IsVisibleForUser(IChatUser user)
+    {
+        if (user.UserId == this.Owner?.UserId)
+            return true;
+        
+        if (this.World.AccessLevel >= SessionAccessLevel.RegisteredUsers)
+            return true;
+        
+        if (this.World.AllUsers.Any(u => u.UserID == user.UserId))
+            return true;
+
+        return false;
+    }
+
     public override string ToString()
     {
         return $"ManagedWorld {Id}: '{Name}' (owned by: {Owner?.Username ?? "nobody"})";
