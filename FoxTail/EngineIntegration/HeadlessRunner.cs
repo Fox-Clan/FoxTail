@@ -20,6 +20,7 @@ public class HeadlessRunner
             "Cache",
             "Logs",
             "RuntimeData",
+            "Stargate"
         ];
     
     public bool ExitComplete { get; private set; }
