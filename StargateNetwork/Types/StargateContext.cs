@@ -5,16 +5,16 @@ namespace StargateNetwork.Types;
 public class StargateContext : DbContext
 {
     public DbSet<Stargate> Stargates { get; set; }
-    
-    public string DbPath { get; set; }
+
+    private readonly string _dbPath;
 
     public StargateContext()
     {
-        this.DbPath = Path.Join(Environment.CurrentDirectory, "stargates.db");
+        this._dbPath = Path.Join(Environment.CurrentDirectory, "stargates.db");
     }
     
     protected override void OnConfiguring(DbContextOptionsBuilder options)
-        => options.UseSqlite($"Data Source={DbPath}");
+        => options.UseSqlite($"Data Source={_dbPath}");
     
     public async Task<Stargate?> FindGateByAddress(string address)
     {
@@ -45,11 +45,5 @@ public class StargateContext : DbContext
                 .Where(b => b.PublicGate == true);
 
         return this.Stargates;
-    }
-
-    public void RemoveGate(Stargate gate, StargateContext ctx)
-    {
-        ctx.Remove(gate);
-        Console.WriteLine("Removing gate: " + gate.Id);
     }
 }

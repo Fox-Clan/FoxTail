@@ -16,69 +16,60 @@ namespace StargateNetwork.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
 
-            modelBuilder.Entity("Stargate", b =>
+            modelBuilder.Entity("StargateNetwork.Types.Stargate", b =>
                 {
-                    b.Property<string>("id")
+                    b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("active_users")
+                    b.Property<int>("ActiveUsers")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("creation_date")
+                    b.Property<long>("CreationDate")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("dialed_gate_id")
-                        .IsRequired()
+                    b.Property<string>("DialedGateId")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("gate_address")
-                        .IsRequired()
+                    b.Property<string>("GateAddress")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("gate_code")
-                        .IsRequired()
+                    b.Property<string>("GateCode")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("gate_status")
-                        .IsRequired()
+                    b.Property<string>("GateStatus")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("iris_state")
-                        .IsRequired()
+                    b.Property<string>("IrisState")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("is_headless")
+                    b.Property<bool>("IsHeadless")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("is_persistent")
+                    b.Property<bool>("IsPersistent")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("max_users")
+                    b.Property<int>("MaxUsers")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("owner_name")
-                        .IsRequired()
+                    b.Property<string>("OwnerName")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("public_gate")
+                    b.Property<bool>("PublicGate")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("session_name")
-                        .IsRequired()
+                    b.Property<string>("SessionName")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("session_url")
-                        .IsRequired()
+                    b.Property<string>("SessionUrl")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("update_date")
+                    b.Property<long>("UpdateDate")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("world_record")
-                        .IsRequired()
+                    b.Property<string>("WorldRecord")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("id");
+                    b.HasKey("Id");
 
                     b.ToTable("Stargates");
                 });

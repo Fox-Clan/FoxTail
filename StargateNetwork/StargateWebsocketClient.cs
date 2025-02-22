@@ -1,29 +1,38 @@
-﻿using Newtonsoft.Json;
+﻿using System.Diagnostics;
+using Newtonsoft.Json;
 using StargateNetwork.Types;
 using WebSocketSharp;
 using WebSocketSharp.Server;
+using Logger = NotEnoughLogs.Logger;
 
 namespace StargateNetwork;
 
-public class StargateClient : WebSocketBehavior, IDisposable
+public class StargateWebsocketClient : WebSocketBehavior, IDisposable
 {
     private readonly StargateContext _db = new();
+    private readonly Logger _logger;
+
+    public StargateWebsocketClient()
+    {
+        this._logger = StargateServer.Instance.Logger;
+        Debug.Assert(this._logger != null);
+    }
 
     protected override async void OnMessage(MessageEventArgs wibi)
     {
-        Console.WriteLine("Received message from client :" + wibi.Data);
+        this._logger.LogTrace("Stargate", "Received message from client: " + wibi.Data);
 
         //check for IDC
         try
         {
             if (wibi.Data.Contains("IDC:"))
             {
-                Console.WriteLine("IDC SENT: " + wibi.Data[4..]);
+                this._logger.LogTrace("Stargate", "IDC SENT: " + wibi.Data[4..]);
                 Stargate? gate = await this._db.FindGateById(ID);
 
                 if (gate == null)
                 {
-                    Console.WriteLine("Current gate not found");
+                    this._logger.LogTrace("Stargate", "Current gate not found");
                     Send("CSValidCheck:404");
                     return;
                 }
@@ -34,7 +43,7 @@ public class StargateClient : WebSocketBehavior, IDisposable
         }
         catch (Exception e)
         {
-            Console.WriteLine("Exception caught during IDC: " + e.Message);
+            this._logger.LogError("Stargate", "Exception caught during IDC: " + e);
         }
 
 
@@ -47,13 +56,13 @@ public class StargateClient : WebSocketBehavior, IDisposable
         }
         else
         {
-            Console.WriteLine("Failed to deserialize message. ignoring...");
+            this._logger.LogWarning("Stargate", "Failed to deserialize message. ignoring...");
             return;
         }
 
 
-        Console.WriteLine("Received: " + type + " from client");
-        Console.WriteLine("Client id = " + ID);
+        this._logger.LogTrace("Stargate", "Received: " + type + " from client");
+        this._logger.LogTrace("Stargate", "Client id = " + ID);
 
         //message handler
         switch (type)
@@ -65,7 +74,7 @@ public class StargateClient : WebSocketBehavior, IDisposable
                 {
                     string requestedAddress =
                         message.gate_address; //i need to do this because cs is being funny
-                    Console.WriteLine("New address request: '" + requestedAddress + "'");
+                    this._logger.LogTrace("Stargate", "New address request: '" + requestedAddress + "'");
 
                     //check db if any gates already have the address
                     Stargate? gate = await this._db.FindGateByAddress(requestedAddress);
@@ -76,19 +85,19 @@ public class StargateClient : WebSocketBehavior, IDisposable
 
                         if (UnixTimestamp - gate.UpdateDate > 60)
                         {
-                            Console.WriteLine("database entry stale, overriding...");
+                            this._logger.LogTrace("Stargate", "database entry stale, overriding...");
                             this._db.Remove(gate);
                             overRide = true;
                         }
                         else if (gate.Id == ID)
                         {
-                            Console.WriteLine("Gate already exists in database. Skipping...");
+                            this._logger.LogTrace("Stargate", "Gate already exists in database. Skipping...");
                             break;
                         }
 
                         if (!overRide)
                         {
-                            Console.WriteLine("Address in use");
+                            this._logger.LogTrace("Stargate", "Address in use");
                             Send("403");
                             break;
                         }
@@ -116,13 +125,13 @@ public class StargateClient : WebSocketBehavior, IDisposable
                     });
                     await this._db.SaveChangesAsync();
                     Send("{code: 200, message: \"Address accepted\" }");
-                    Console.WriteLine("Stargate added to database");
+                    this._logger.LogDebug("Stargate", $"Stargate added to database by {ID}");
 
                     break;
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Exception caught during address request: " + e.Message);
+                    this._logger.LogError("Stargate", "Exception caught during address request: " + e);
                     Send("403");
                     break;
                 }
@@ -133,12 +142,12 @@ public class StargateClient : WebSocketBehavior, IDisposable
             {
                 try
                 {
-                    Console.WriteLine("Address validation Requested");
+                    this._logger.LogTrace("Stargate", "Address validation Requested");
 
                     string requestedAddressFull = message.gate_address;
                     if (requestedAddressFull.Length < 6)
                     {
-                        Console.WriteLine("Address is too short");
+                        this._logger.LogTrace("Stargate", "Address is too short");
                         Send("CSDialCheck:404");
                         break;
                     }
@@ -151,14 +160,14 @@ public class StargateClient : WebSocketBehavior, IDisposable
 
                     if (requestedGate == null)
                     {
-                        Console.WriteLine("Requested gate not found");
+                        this._logger.LogTrace("Stargate", "Requested gate not found");
                         Send("CSValidCheck:404");
                         break;
                     }
 
                     if (currentGate == null)
                     {
-                        Console.WriteLine("Current gate not found");
+                        this._logger.LogTrace("Stargate", "Current gate not found");
                         Send("CSValidCheck:404");
                         break;
                     }
@@ -166,14 +175,14 @@ public class StargateClient : WebSocketBehavior, IDisposable
                     //check if requested address is of valid length (WHYYYYY IS THIS A SEPRORATE FUNCTION FOR UNIVERSE GATES OTHER GATES DO THIS IN GAME!!!!!!
                     if (requestedAddress.Length < 6)
                     {
-                        Console.WriteLine("Address is too short");
+                        this._logger.LogTrace("Stargate", "Address is too short");
                         Send("CSValidCheck:400");
                     }
 
                     //check if gate is trying to dial itself
                     if (requestedGate.GateAddress == currentGate.GateAddress)
                     {
-                        Console.WriteLine("Gate is trying to dial itself!!!");
+                        this._logger.LogTrace("Stargate", "Gate is trying to dial itself!!!");
                         Send("CSValidCheck:403");
                         break;
                     }
@@ -181,8 +190,8 @@ public class StargateClient : WebSocketBehavior, IDisposable
                     //check if destination gate is busy
                     if (requestedGate.GateStatus != "IDLE")
                     {
-                        Console.WriteLine("Gate is busy");
-                        Console.WriteLine("Gate status: " + requestedGate.GateStatus);
+                        this._logger.LogTrace("Stargate", "Gate is busy");
+                        this._logger.LogTrace("Stargate", "Gate status: " + requestedGate.GateStatus);
                         Send("CSValidCheck:403");
                         break;
                     }
@@ -242,7 +251,7 @@ public class StargateClient : WebSocketBehavior, IDisposable
 
                     if (chevCount == -1)
                     {
-                        Console.WriteLine("Invalid gate code!");
+                        this._logger.LogTrace("Stargate", "Invalid gate code!");
                         Send("CSValidCheck:302");
                         break;
                     }
@@ -250,7 +259,7 @@ public class StargateClient : WebSocketBehavior, IDisposable
                     //check if destination is full
                     if (requestedGate.ActiveUsers >= requestedGate.MaxUsers)
                     {
-                        Console.WriteLine("Max users reached on requested session!");
+                        this._logger.LogTrace("Stargate", "Max users reached on requested session!");
                         Send("CSValidCheck:403");
                         break;
                     }
@@ -263,7 +272,7 @@ public class StargateClient : WebSocketBehavior, IDisposable
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Exception caught during address validation: " + e.Message);
+                    this._logger.LogError("Stargate", "Exception caught during address validation: " + e);
                     Send("CSValidCheck:403");
                     break;
                 }
@@ -274,12 +283,12 @@ public class StargateClient : WebSocketBehavior, IDisposable
             {
                 try
                 {
-                    Console.WriteLine("Dial Requested");
+                    this._logger.LogTrace("Stargate", "Dial Requested");
 
                     string requestedAddressFull = message.gate_address;
                     if (requestedAddressFull.Length < 6)
                     {
-                        Console.WriteLine("Address is too short");
+                        this._logger.LogTrace("Stargate", "Address is too short");
                         Send("CSDialCheck:404");
                         break;
                     }
@@ -292,14 +301,14 @@ public class StargateClient : WebSocketBehavior, IDisposable
 
                     if (requestedGate == null)
                     {
-                        Console.WriteLine("Requested gate not found");
+                        this._logger.LogTrace("Stargate", "Requested gate not found");
                         Send("CSValidCheck:404");
                         break;
                     }
 
                     if (currentGate == null)
                     {
-                        Console.WriteLine("Current gate not found");
+                        this._logger.LogTrace("Stargate", "Current gate not found");
                         Send("CSValidCheck:404");
                         break;
                     }
@@ -307,7 +316,7 @@ public class StargateClient : WebSocketBehavior, IDisposable
                     //check if gate is trying to dial itself
                     if (requestedGate.GateAddress == currentGate.GateAddress)
                     {
-                        Console.WriteLine("Gate is trying to dial itself!!!");
+                        this._logger.LogTrace("Stargate", "Gate is trying to dial itself!!!");
                         Send("CSDialCheck:403");
                         break;
                     }
@@ -315,8 +324,8 @@ public class StargateClient : WebSocketBehavior, IDisposable
                     //check if destination gate is busy
                     if (requestedGate.GateStatus != "IDLE")
                     {
-                        Console.WriteLine("Gate is busy");
-                        Console.WriteLine("Gate status: " + requestedGate.GateStatus);
+                        this._logger.LogTrace("Stargate", "Gate is busy");
+                        this._logger.LogTrace("Stargate", "Gate status: " + requestedGate.GateStatus);
                         Send("CSValidCheck:403");
                         break;
                     }
@@ -327,7 +336,7 @@ public class StargateClient : WebSocketBehavior, IDisposable
                         /*
                         if (!(requestedGate.world_record == //function that returns true if the world is already up))
                         {
-                            Console.WriteLine("Requested gate is in closed world. starting...")
+                            this._logger.LogTrace("Stargate", "Requested gate is in closed world. starting...")
                             //function that starts world
                             //waits for world to start
 
@@ -393,7 +402,7 @@ public class StargateClient : WebSocketBehavior, IDisposable
 
                     if (chevCount == -1)
                     {
-                        Console.WriteLine("Invalid gate code!");
+                        this._logger.LogTrace("Stargate", "Invalid gate code!");
                         Send("CSDialCheck:302");
                         break;
                     }
@@ -401,7 +410,7 @@ public class StargateClient : WebSocketBehavior, IDisposable
                     //check if destination is full
                     if (requestedGate.ActiveUsers >= requestedGate.MaxUsers)
                     {
-                        Console.WriteLine("Max users reached on requested session!");
+                        this._logger.LogTrace("Stargate", "Max users reached on requested session!");
                         Send("CSDialCheck:403");
                         break;
                     }
@@ -439,13 +448,13 @@ public class StargateClient : WebSocketBehavior, IDisposable
                         }
                     }
 
-                    Console.Write("Stargate open!");
+                   this._logger.LogTrace("Stargate", "Stargate open!");
 
                     break;
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Exception caught during dial request: " + e.Message);
+                    this._logger.LogError("Stargate", "Exception caught during dial request: " + e);
                     Send("CSDialCheck:403");
                     break;
                 }
@@ -461,13 +470,13 @@ public class StargateClient : WebSocketBehavior, IDisposable
 
                     if (currentGate == null)
                     {
-                        Console.WriteLine("Current gate not found");
+                        this._logger.LogTrace("Stargate", "Current gate not found");
                         Send("CSValidCheck:404");
                         break;
                     }
 
                     //close remote gate
-                    Console.WriteLine("Closing wormhole: " + currentGate.DialedGateId);
+                    this._logger.LogTrace("Stargate", "Closing wormhole: " + currentGate.DialedGateId);
                     Sessions.SendTo("Impulse:CloseWormhole", currentGate.DialedGateId);
 
                     currentGate.DialedGateId = "";
@@ -478,7 +487,7 @@ public class StargateClient : WebSocketBehavior, IDisposable
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Exception caught during close wormhole: " + e.Message);
+                    this._logger.LogTrace("Stargate", "Exception caught during close wormhole: " + e);
                     break;
                 }
             }
@@ -488,14 +497,14 @@ public class StargateClient : WebSocketBehavior, IDisposable
             {
                 try
                 {
-                    Console.WriteLine("Updated requested");
+                    this._logger.LogTrace("Stargate", "Updated requested");
 
                     //find gate and update record
                     Stargate? gate = await this._db.FindGateById(ID);
 
                     if (gate == null)
                     {
-                        Console.WriteLine("No stargate found for update. Is it registered?");
+                        this._logger.LogTrace("Stargate", "No stargate found for update. Is it registered?");
                         break;
                     }
 
@@ -505,13 +514,13 @@ public class StargateClient : WebSocketBehavior, IDisposable
                     gate.UpdateDate = UnixTimestamp;
                     await this._db.SaveChangesAsync();
 
-                    Console.WriteLine("Updated record");
+                    this._logger.LogTrace("Stargate", "Updated record");
 
                     break;
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Exception caught during update data: " + e.Message);
+                    this._logger.LogError("Stargate", "Exception caught during update data: " + e);
                     break;
                 }
             }
@@ -521,14 +530,14 @@ public class StargateClient : WebSocketBehavior, IDisposable
             {
                 try
                 {
-                    Console.WriteLine("Iris state: " + message.iris_state);
+                    this._logger.LogTrace("Stargate", "Iris state: " + message.iris_state);
 
                     //set iris state in database // 
                     Stargate? gate = await this._db.FindGateById(ID);
 
                     if (gate == null)
                     {
-                        Console.WriteLine("Current gate not found");
+                        this._logger.LogTrace("Stargate", "Current gate not found");
                         Send("CSValidCheck:404");
                         break;
                     }
@@ -536,12 +545,12 @@ public class StargateClient : WebSocketBehavior, IDisposable
                     gate.IrisState = message.iris_state;
                     await this._db.SaveChangesAsync();
 
-                    Console.WriteLine("Sending iris state to dialing gate");
+                    this._logger.LogTrace("Stargate", "Sending iris state to dialing gate");
                     Stargate? incomingGate = await this._db.FindGateByDialedId(gate.Id);
 
                     if (incomingGate == null)
                     {
-                        Console.WriteLine("Incoming gate not found");
+                        this._logger.LogTrace("Stargate", "Incoming gate not found");
                         Send("CSValidCheck:404");
                         break;
                     }
@@ -552,7 +561,7 @@ public class StargateClient : WebSocketBehavior, IDisposable
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Exception caught during update iris: " + e.Message);
+                    this._logger.LogError("Stargate", "Exception caught during update iris: " + e);
                     break;
                 }
             }
@@ -566,7 +575,7 @@ public class StargateClient : WebSocketBehavior, IDisposable
 
                     if (gate == null)
                     {
-                        Console.WriteLine("Current gate not found");
+                        this._logger.LogTrace("Stargate", "Current gate not found");
                         Send("CSValidCheck:404");
                         break;
                     }
@@ -578,7 +587,7 @@ public class StargateClient : WebSocketBehavior, IDisposable
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Exception caught during keep alive: " + e.Message);
+                    this._logger.LogError("Stargate", "Exception caught during keep alive: " + e);
                     break;
                 }
             }
@@ -589,7 +598,7 @@ public class StargateClient : WebSocketBehavior, IDisposable
 
     public void Dispose()
     {
-        _db.Dispose();
+        this._db.Dispose();
         GC.SuppressFinalize(this);
     }
 }

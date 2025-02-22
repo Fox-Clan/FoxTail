@@ -12,6 +12,8 @@ public class StargateBunkumServer
 
     public StargateBunkumServer()
     {
+        Environment.SetEnvironmentVariable("BUNKUM_DATA_FOLDER", "Stargate");
+        
         BunkumServer server = new BunkumHttpServer(new LoggerConfiguration
         { 
             Behaviour = new QueueLoggingBehaviour(),
