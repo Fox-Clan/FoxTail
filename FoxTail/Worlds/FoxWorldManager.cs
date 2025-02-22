@@ -105,4 +105,9 @@ public class FoxWorldManager
         return this._worlds
             .FirstOrDefault(w => w.World.AllUsers.FirstOrDefault(u => u.UserID == user.UserId && u.IsPresentInWorld) != null);
     }
+
+    public bool IsWorldOpen(Uri recordUrl)
+    {
+        return this._worlds.Any(w => w.World.RecordURL == recordUrl);
+    }
 }
