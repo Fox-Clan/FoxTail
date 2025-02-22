@@ -1,11 +1,10 @@
 using System.Reflection;
 using Bunkum.Core;
-using Bunkum.Core.Endpoints;
-using Bunkum.Listener.Protocol;
 using Bunkum.Protocols.Http;
-using Newtonsoft.Json;
 using NotEnoughLogs;
 using NotEnoughLogs.Behaviour;
+
+namespace StargateNetwork;
 
 public class BunKum
 {
@@ -14,11 +13,11 @@ public class BunKum
         BunkumServer server = new BunkumHttpServer(new LoggerConfiguration
         { 
             Behaviour = new QueueLoggingBehaviour(),
-            #if DEBUG
+#if DEBUG
             MaxLevel = LogLevel.Trace,
-            #else
+#else
             MaxLevel = LogLevel.Info,
-            #endif
+#endif
         });
 
         server.Initialize = s =>
@@ -29,4 +28,3 @@ public class BunKum
         await Task.Delay(-1);
     }
 }
-

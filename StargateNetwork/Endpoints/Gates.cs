@@ -3,6 +3,7 @@ using Bunkum.Core.Endpoints;
 using Bunkum.Listener.Protocol;
 using Bunkum.Protocols.Http;
 using Newtonsoft.Json;
+using StargateNetwork.Types;
 
 namespace StargateNetwork.endpoints;
 
@@ -12,9 +13,9 @@ public class GateEndpoints : EndpointGroup
     [HttpEndpoint("/gates", HttpMethods.Get, ContentType.Plaintext)]
     public String GetGates(RequestContext context)
     {
-        using (var db = new StargateContext())
+        using (StargateContext db = new())
         {
-            var gates = StargateTools.FindAllGates(db, onlyNonPersistent: false, onlyPublic: true);
+            List<Stargate> gates = StargateTools.FindAllGates(db, onlyNonPersistent: false, onlyPublic: true);
             string gateList = JsonConvert.SerializeObject(gates);
             return gateList;
         }

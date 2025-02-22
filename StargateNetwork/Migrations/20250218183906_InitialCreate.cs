@@ -1,9 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
+using StargateNetwork.Types;
 
 #nullable disable
 
 namespace StargateNetwork.Migrations
 {
+    [DbContext(typeof(StargateContext))]
+    [Migration("20250218183906_InitialCreate")]
     /// <inheritdoc />
     public partial class InitialCreate : Migration
     {
