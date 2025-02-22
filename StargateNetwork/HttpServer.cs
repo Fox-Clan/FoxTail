@@ -6,9 +6,11 @@ using NotEnoughLogs.Behaviour;
 
 namespace StargateNetwork;
 
-public class BunKum
+public class StargateBunkumServer
 {
-    public static async void StartBunKum()
+    private readonly BunkumServer _server;
+
+    public StargateBunkumServer()
     {
         BunkumServer server = new BunkumHttpServer(new LoggerConfiguration
         { 
@@ -24,7 +26,17 @@ public class BunKum
         {
             s.DiscoverEndpointsFromAssembly(Assembly.GetExecutingAssembly());
         };
-        server.Start();
-        await Task.Delay(-1);
+
+        this._server = server;
+    }
+    
+    public void Start()
+    {
+        this._server.Start();
+    }
+
+    public void Stop()
+    {
+        this._server.Stop();
     }
 }

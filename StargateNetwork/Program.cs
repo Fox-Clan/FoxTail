@@ -46,13 +46,14 @@ internal static class Program
         }
 
         //start websocket server
-        WebSocketServer server = new(wsUri);
-        server.AddWebSocketService<StargateClient>("/Echo");
-        server.Start();
+        WebSocketServer wsServer = new(wsUri);
+        wsServer.AddWebSocketService<StargateClient>("/Echo");
+        wsServer.Start();
         Console.WriteLine("server started on: " + wsUri);
 
         //start bunkum http server
-        BunKum.StartBunKum();
+        StargateBunkumServer bunkumServer = new();
+        bunkumServer.Start();
 
         //start database cleaner thread
         Thread dbCleanThread = new(CleanStaleDb);
@@ -60,6 +61,7 @@ internal static class Program
         Console.WriteLine("Db cleaner started");
 
         Console.ReadKey();
-        server.Stop();
+        wsServer.Stop();
+        bunkumServer.Stop();
     }
 }

@@ -26,10 +26,5 @@ public class Stargate
     public long CreationDate { get; set; }
     public string DialedGateId { get; set; }
     public bool IsPersistent { get; set; }
-    public string WorldRecord  { get; set; }
-    
-    // public static readonly Stargate Null = new()
-    // {
-    //     Id = "NULL",
-    // };
+    public string WorldRecord { get; set; }
 }
