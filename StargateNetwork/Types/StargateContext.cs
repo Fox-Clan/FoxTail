@@ -10,7 +10,7 @@ public class StargateContext : DbContext
 
     public StargateContext()
     {
-        this._dbPath = Path.Join(Environment.CurrentDirectory, "stargates.db");
+        this._dbPath = Path.Join(Environment.CurrentDirectory, "Stargate/sqlite.db");
     }
     
     protected override void OnConfiguring(DbContextOptionsBuilder options)
