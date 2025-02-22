@@ -21,4 +21,8 @@
       <PackageReference Include="WebSocketSharp" Version="1.0.3-rc11" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\FoxTail.Common\FoxTail.Common.csproj" />
+    </ItemGroup>
+
 </Project>

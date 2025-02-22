@@ -37,6 +37,11 @@
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
       <PackageReference Include="NotEnoughLogs" Version="2.0.3" />
     </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\FoxTail.Common\FoxTail.Common.csproj" />
+      <ProjectReference Include="..\StargateNetwork\StargateNetwork.csproj" />
+    </ItemGroup>
     
     
 

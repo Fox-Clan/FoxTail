@@ -5,6 +5,7 @@ using FoxTail.Worlds;
 using FrooxEngine;
 using HarmonyLib;
 using NotEnoughLogs;
+using StargateNetwork;
 
 namespace FoxTail;
 
@@ -17,6 +18,7 @@ public class HeadlessContext : IDisposable
     public FoxTailConfig Config;
     public WorldConfig WorldConfig;
     public UserConfig UserConfig;
+    public StargateConfiguration StargateConfig;
 
     public HeadlessRunner Runner;
     
@@ -26,6 +28,8 @@ public class HeadlessContext : IDisposable
     
     public ChatCommandHelper CommandHelper;
     public FoxWorldManager WorldManager;
+
+    public StargateServer StargateServer;
 
     private bool _disposed;
 
@@ -37,8 +41,9 @@ public class HeadlessContext : IDisposable
         _disposed = true;
         Logger.LogInfo(ResoCategory.Runner, "Disposing HeadlessContext.");
         
-        Logger?.Dispose();
-        Engine?.Dispose();
+        StargateServer.Dispose();
         CommandHelper?.Dispose();
+        Engine?.Dispose();
+        Logger?.Dispose();
     }
 }

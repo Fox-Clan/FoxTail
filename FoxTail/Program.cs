@@ -9,6 +9,7 @@ using HarmonyLib;
 using NotEnoughLogs;
 using NotEnoughLogs.Behaviour;
 using NotEnoughLogs.Sinks;
+using StargateNetwork;
 
 namespace FoxTail;
 
@@ -44,6 +45,7 @@ internal static class Program
         Context.Config = ConfigHelper.GetOrCreateConfig<FoxTailConfig>(Context, "foxtail.json", ref createdNewConfig);
         Context.WorldConfig = ConfigHelper.GetOrCreateConfig<WorldConfig>(Context, "worlds.json", ref createdNewConfig);
         Context.UserConfig = ConfigHelper.GetOrCreateConfig<UserConfig>(Context, "users.json", ref createdNewConfig);
+        Context.StargateConfig = ConfigHelper.GetOrCreateConfig<StargateConfiguration>(Context, "stargate.json", ref createdNewConfig);
 
         if (createdNewConfig)
         {
