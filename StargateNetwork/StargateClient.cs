@@ -19,7 +19,15 @@ public class StargateClient : WebSocketBehavior
                 using (StargateContext db = new())
                 {
                     Console.WriteLine("IDC SENT: " + wibi.Data[4..]);
-                    Stargate gate = await StargateTools.FindGateById(ID, db);
+                    Stargate? gate = await db.FindGateById(ID);
+                    
+                    if (gate == null)
+                    {
+                        Console.WriteLine("Current gate not found");
+                        Send("CSValidCheck:404");
+                        return;
+                    }
+                    
                     Sessions.SendTo(wibi.Data, gate.DialedGateId);
                     return;
                 }
@@ -63,9 +71,9 @@ public class StargateClient : WebSocketBehavior
                     //check db if any gates already have the address
                     using (StargateContext db = new())
                     {
-                        Stargate gate = await StargateTools.FindGateByAddress(requestedAddress, db);
+                        Stargate? gate = await db.FindGateByAddress(requestedAddress);
 
-                        if (gate.Id != "NULL")
+                        if (gate != null)
                         {
                             bool overRide = false;
 
@@ -89,7 +97,7 @@ public class StargateClient : WebSocketBehavior
                             }
                         }
 
-                        db.Add(new Stargate()
+                        db.Add(new Stargate
                         {
                             Id = ID,
                             GateAddress = message.gate_address,
@@ -144,14 +152,19 @@ public class StargateClient : WebSocketBehavior
                     //query database for requested gate
                     using (StargateContext db = new())
                     {
-                        Stargate requestedGate = await StargateTools.FindGateByAddress(requestedAddress, db);
+                        Stargate? requestedGate = await db.FindGateByAddress(requestedAddress);
+                        Stargate? currentGate = await db.FindGateById(ID);
 
-                        Stargate currentGate = await StargateTools.FindGateById(ID, db);
-
-                        //check if requested gate exists
-                        if (requestedGate.Id == "NULL")
+                        if (requestedGate == null)
                         {
-                            Console.WriteLine("No stargate found");
+                            Console.WriteLine("Requested gate not found");
+                            Send("CSValidCheck:404");
+                            break;
+                        }
+                        
+                        if (currentGate == null)
+                        {
+                            Console.WriteLine("Current gate not found");
                             Send("CSValidCheck:404");
                             break;
                         }
@@ -283,15 +296,20 @@ public class StargateClient : WebSocketBehavior
                     //query database for requested gate
                     using (StargateContext db = new())
                     {
-                        Stargate requestedGate = await StargateTools.FindGateByAddress(requestedAddress, db);
+                        Stargate? requestedGate = await db.FindGateByAddress(requestedAddress);
+                        Stargate? currentGate = await db.FindGateById(ID);
 
-                        Stargate currentGate = await StargateTools.FindGateById(ID, db);
-
-                        //check if requested gate exists
-                        if (requestedGate.Id == "NULL")
+                        if (requestedGate == null)
                         {
-                            Console.WriteLine("No stargate found");
-                            Send("CSDialCheck:404");
+                            Console.WriteLine("Requested gate not found");
+                            Send("CSValidCheck:404");
+                            break;
+                        }
+                        
+                        if (currentGate == null)
+                        {
+                            Console.WriteLine("Current gate not found");
+                            Send("CSValidCheck:404");
                             break;
                         }
 
@@ -323,7 +341,7 @@ public class StargateClient : WebSocketBehavior
                                 //waits for world to start
 
                                 //updates gate info
-                                requestedGate = await StargateTools.FindGateByAddress(requestedAddress, db);
+                                requestedGate = await db.FindGateByAddress(requestedAddress, db);
                             }
                             */
                         }
@@ -451,7 +469,14 @@ public class StargateClient : WebSocketBehavior
                     //query database for current gate
                     using (StargateContext db = new())
                     {
-                        Stargate currentGate = await StargateTools.FindGateById(ID, db);
+                        Stargate? currentGate = await db.FindGateById(ID);
+                        
+                        if (currentGate == null)
+                        {
+                            Console.WriteLine("Current gate not found");
+                            Send("CSValidCheck:404");
+                            break;
+                        }
 
                         //close remote gate
                         Console.WriteLine("Closing wormhole: " + currentGate.DialedGateId);
@@ -481,9 +506,9 @@ public class StargateClient : WebSocketBehavior
                     //find gate and update record
                     using (StargateContext db = new())
                     {
-                        Stargate gate = await StargateTools.FindGateById(ID, db);
+                        Stargate? gate = await db.FindGateById(ID);
 
-                        if (gate.Id == "NULL")
+                        if (gate == null)
                         {
                             Console.WriteLine("No stargate found for update. Is it registered?");
                             break;
@@ -517,13 +542,28 @@ public class StargateClient : WebSocketBehavior
                     using (StargateContext db = new())
                     {
                         //set iris state in database // 
-                        Stargate gate = await StargateTools.FindGateById(ID, db);
+                        Stargate? gate = await db.FindGateById(ID);
+                        
+                        if (gate == null)
+                        {
+                            Console.WriteLine("Current gate not found");
+                            Send("CSValidCheck:404");
+                            break;
+                        }
+                        
                         gate.IrisState = message.iris_state;
                         await db.SaveChangesAsync();
-
-
+                        
                         Console.WriteLine("Sending iris state to dialing gate");
-                        Stargate incomingGate = await StargateTools.FindGateByDialedId(gate.Id, db);
+                        Stargate? incomingGate = await db.FindGateByDialedId(gate.Id);
+                        
+                        if (incomingGate == null)
+                        {
+                            Console.WriteLine("Incoming gate not found");
+                            Send("CSValidCheck:404");
+                            break;
+                        }
+                        
                         Sessions.SendTo("IrisUpdate:" + gate.IrisState, incomingGate.Id);
                     }
 
@@ -543,7 +583,15 @@ public class StargateClient : WebSocketBehavior
                 {
                     using (StargateContext db = new())
                     {
-                        Stargate gate = await StargateTools.FindGateById(ID, db);
+                        Stargate? gate = await db.FindGateById(ID);
+                        
+                        if (gate == null)
+                        {
+                            Console.WriteLine("Current gate not found");
+                            Send("CSValidCheck:404");
+                            break;
+                        }
+                        
                         gate.UpdateDate = UnixTimestamp;
                         await db.SaveChangesAsync();
                     }

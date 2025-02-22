@@ -13,13 +13,13 @@ internal static class Program
             {
                 using (StargateContext db = new())
                 {
-                    List<Stargate> gates = StargateTools.FindAllGates(db, true);
+                    IEnumerable<Stargate> gates = db.FindAllGates(true);
 
                     foreach (Stargate gate in gates)
                     {
                         if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() - gate.UpdateDate <= 60) continue;
                         
-                        StargateTools.RemoveGate(gate, db);
+                        db.RemoveGate(gate, db);
                         Console.WriteLine("Cleaned stale stargate from database");
                     }
 
@@ -36,7 +36,7 @@ internal static class Program
     }
 
 
-    private static void Main(string[] args)
+    private static void Main()
     {
         //get env vars
         string? wsUri = Environment.GetEnvironmentVariable("WS_URI");

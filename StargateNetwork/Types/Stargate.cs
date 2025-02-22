@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -6,6 +7,7 @@ namespace StargateNetwork.Types;
 #nullable disable
 
 [JsonObject(NamingStrategyType = typeof(SnakeCaseNamingStrategy))]
+[SuppressMessage("ReSharper", "EntityFramework.ModelValidation.UnlimitedStringLength")]
 public class Stargate
 {
     public int ActiveUsers { get; set; }
@@ -26,8 +28,8 @@ public class Stargate
     public bool IsPersistent { get; set; }
     public string WorldRecord  { get; set; }
     
-    public static readonly Stargate Null = new()
-    {
-        Id = "NULL",
-    };
+    // public static readonly Stargate Null = new()
+    // {
+    //     Id = "NULL",
+    // };
 }
