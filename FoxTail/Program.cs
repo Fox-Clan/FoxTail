@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Loader;
 using Elements.Core;
 using FoxTail.Configuration;
@@ -17,6 +18,7 @@ internal static class Program
 
     public static HeadlessContext Context;
     
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
     public static async Task Main()
     {
         ConsoleColor oldColor = Console.ForegroundColor;
@@ -38,8 +40,18 @@ internal static class Program
         });
         
         Context.Logger.LogInfo(ResoCategory.Config, "Loading configurations...");
-        Context.Config = ConfigHelper.GetOrCreateConfig<FoxTailConfig>(Context, "foxtail.json");
-        Context.WorldConfig = ConfigHelper.GetOrCreateConfig<WorldConfig>(Context, "worlds.json");
+        bool createdNewConfig = false;
+        Context.Config = ConfigHelper.GetOrCreateConfig<FoxTailConfig>(Context, "foxtail.json", ref createdNewConfig);
+        Context.WorldConfig = ConfigHelper.GetOrCreateConfig<WorldConfig>(Context, "worlds.json", ref createdNewConfig);
+        Context.UserConfig = ConfigHelper.GetOrCreateConfig<UserConfig>(Context, "users.json", ref createdNewConfig);
+
+        if (createdNewConfig)
+        {
+            Context.Logger.LogWarning(ResoCategory.Config, "It is highly advisable that you stop the server now and modify the above configurations.");
+            Context.Logger.LogWarning(ResoCategory.Config, "If not, startup will continue in 10 seconds.");
+            Thread.Sleep(10_000);
+            Context.Logger.LogWarning(ResoCategory.Config, "Continuing startup without config change!");
+        }
         
         Context.Logger.LogInfo(ResoCategory.Harmony, "Initializing Harmony...");
         HeadlessContext.Harmony = new Harmony(nameof(FoxTail));
