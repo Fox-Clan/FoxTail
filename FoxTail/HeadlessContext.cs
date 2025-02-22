@@ -16,6 +16,7 @@ public class HeadlessContext : IDisposable
 
     public FoxTailConfig Config;
     public WorldConfig WorldConfig;
+    public UserConfig UserConfig;
 
     public HeadlessRunner Runner;
     

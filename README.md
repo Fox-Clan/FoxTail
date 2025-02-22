@@ -3,7 +3,7 @@ A custom headless runner for Resonite.
 
 ## todo for public
 - [x] dont hardcode worlds
-- [ ] dont hardcode known users
+- [x] dont hardcode known users
 - [ ] docs on env vars
 - [x] engine shutdown
 - [x] command to restart

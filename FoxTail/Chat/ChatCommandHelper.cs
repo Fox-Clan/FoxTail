@@ -16,22 +16,19 @@ public class ChatCommandHelper : IDisposable
 
     private readonly List<IChatPlatform> _platforms = [];
 
-    private readonly FrozenSet<string> _approvedUserIds = new List<string>
+    public bool IsApproved(IChatUser user)
     {
-        "console",
-        // Discord
-        "956347815267827713", // jvyden
-        "329085556791443459", // beyley
-        "193490239539511296", // steph
-        "288074994188156928", // guppy
-        // Resonite
-        "U-1YIjc7KyPL6", // jvyden
-        "U-1XNdZruECCu", // beyley
-        "U-1UOo6cljQsy", // steph
-        "U-TheGuppy525", // guppy
-    }.ToFrozenSet();
+        if (user.UserId == "console")
+            return true;
 
-    public bool IsApproved(IChatUser user) => _approvedUserIds.Contains(user.UserId);
+        if (_context.UserConfig.Owner.Ids.Contains(user.UserId))
+            return true;
+
+        if (_context.UserConfig.Users.Any(u => u.Ids.Contains(user.UserId)))
+            return true;
+
+        return false;
+    }
 
     public ChatCommandHelper(HeadlessContext context)
     {

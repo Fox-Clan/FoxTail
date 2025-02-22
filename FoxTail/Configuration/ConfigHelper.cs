@@ -3,9 +3,9 @@ using Newtonsoft.Json;
 
 namespace FoxTail.Configuration;
 
-public static class ConfigHelper
+internal static class ConfigHelper
 {
-    public static TConfig GetOrCreateConfig<TConfig>(HeadlessContext context, string filename) where TConfig : class, new()
+    internal static TConfig GetOrCreateConfig<TConfig>(HeadlessContext context, string filename, ref bool created) where TConfig : class, new()
     {
         context.Logger.LogTrace(ResoCategory.Config, $"Trying to load config {filename}");
         Debug.Assert(filename.EndsWith(".json"));
@@ -21,6 +21,7 @@ public static class ConfigHelper
             
             File.WriteAllText(filename, JsonConvert.SerializeObject(config, Formatting.Indented));
             context.Logger.LogWarning(ResoCategory.Config, $"The config file `{filename}` did not exist. A new one was created in the current directory.");
+            created = true;
         }
         else
         {
