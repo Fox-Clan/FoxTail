@@ -1,4 +1,7 @@
-﻿namespace FoxTail.Chat.CommandSupport;
+﻿using FoxTail.Chat.Platforms;
+using FoxTail.Worlds;
+
+namespace FoxTail.Chat.CommandSupport;
 
 public abstract class ArgContainer
 {
@@ -32,5 +35,27 @@ public abstract class ArgContainer
             return null;
         
         return uri;
+    }
+
+    public uint? GetUint(string name)
+    {
+        string? uintStr = GetArg(name);
+        if (uintStr == null)
+            return null;
+
+        bool success = uint.TryParse(uintStr, out uint result);
+        if (!success)
+            return null;
+
+        return result;
+    }
+
+    public ManagedWorld? WorldByIdOrUserFocused(HeadlessContext context, IChatUser user)
+    {
+        uint? worldId = GetUint("worldId");
+        if (worldId == null)
+            return context.WorldManager.FindWorldUserIn(user);
+
+        return context.WorldManager.FindWorldById(worldId.Value);
     }
 }

@@ -100,25 +100,6 @@ public class ChatCommandHelper : IDisposable
 
             switch (command)
             {
-                case "close":
-                {
-                    if (!IsApproved(user))
-                    {
-                        await Deny();
-                        break;
-                    }
-                    
-                    ManagedWorld? world = this._context.WorldManager.FindWorldUserIn(user);
-                    if (world == null)
-                    {
-                        await Reply("I couldn't find the world you were in, so I can't close it. Try joining/focusing the world.");
-                        break;
-                    }
-                    
-                    await this._context.WorldManager.CloseWorld(world);
-                    await Reply("Closed " + world.Name + ".");
-                    break;
-                }
                 case "save":
                 {
                     if (!IsApproved(user))
