@@ -23,15 +23,11 @@ public class ConsoleChatPlatform : IChatPlatform, IDisposable
                 Message message = new()
                 {
                     Content = line,
-                    SenderId = "console",
+                    SenderId = "console"
                 };
 
                 ResoniteChatChannel channel = new(this, message);
-                ResoniteChatUser user = new(this, new User
-                {
-                    Username = "console",
-                    Id = "console",
-                });
+                ConsoleChatUser user = new(this);
 
                 await _context.CommandHelper.ReceiveCommand(channel, user, ChatCommandHelper.ParseSimpleCommand(line));
             }

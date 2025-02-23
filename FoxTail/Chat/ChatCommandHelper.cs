@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using FoxTail.Chat.CommandSupport;
 using FoxTail.Chat.Platforms;
+using FoxTail.Chat.Platforms.Console;
 using FoxTail.Chat.Platforms.Resonite;
 using FoxTail.Common;
 using FoxTail.Worlds;
@@ -38,7 +39,7 @@ public class ChatCommandHelper : IDisposable
     
     public bool IsApproved(IChatUser user)
     {
-        if (user.UserId == "console")
+        if (user is ConsoleChatUser)
             return true;
 
         if (_context.UserConfig.Owner.Ids.Contains(user.UserId))
