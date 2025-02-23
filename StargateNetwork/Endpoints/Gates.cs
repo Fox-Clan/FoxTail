@@ -13,6 +13,6 @@ public class GateEndpoints : EndpointGroup
     public IEnumerable<Stargate> GetGates(RequestContext context)
     {
         using StargateContext db = new();
-        return db.FindAllGates(onlyNonPersistent: false, onlyPublic: true);
+        return db.FindAllGates(onlyPublic: true).ToList();
     }
 }

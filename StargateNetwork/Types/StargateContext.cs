@@ -34,7 +34,7 @@ public class StargateContext : DbContext
             .SingleOrDefaultAsync(b => b.DialedGateId == id);
     }
 
-    public IEnumerable<Stargate> FindAllGates(bool onlyNonPersistent, bool onlyPublic = false)
+    public IEnumerable<Stargate> FindAllGates(bool onlyNonPersistent = false, bool onlyPublic = false)
     {
         if (onlyNonPersistent)
             return this.Stargates
