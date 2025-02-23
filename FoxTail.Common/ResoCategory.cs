@@ -14,4 +14,5 @@ public enum ResoCategory : byte
     Config,
     Stargate,
     StargateWorld,
+    LoveAuth,
 }
