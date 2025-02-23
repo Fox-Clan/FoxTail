@@ -1,9 +1,8 @@
-﻿using FoxTail.Chat.CommandSupport;
-using FoxTail.Chat.Platforms;
+﻿using FoxTail.Chat.Platforms;
 using FoxTail.Worlds;
 using FrooxEngine;
 
-namespace FoxTail.Chat.Commands;
+namespace FoxTail.Chat.CommandSupport;
 
 public abstract class StartWorldPresetCommand : IChatCommand
 {

@@ -85,52 +85,29 @@ public class ChatCommandHelper : IDisposable
             {
                 if (chatCommand.RequirePermission && !this.IsApproved(user))
                 {
-                    await Deny();
+                    await Reply("Ah-ah-ah, you didn't say the magic word!");
                     return;
                 }
                 await chatCommand.InvokeAsync(this._context, channel, user, args);
-                return;
             }
-            // else // TODO: uncomment when all commands ported
-            // {
-            //     if (channel.IsDirect)
-            //         await Reply("fennec no know that command :(");
-            //     return;
-            // }
-
-            switch (command)
+            else
             {
-                case "promote": // TODO: aliases
-                case "admin":
-                {
-                    await ReceiveCommand(channel, user, "role", new EnumeratingArgContainer("admin"));
-                    break;
-                }
-                default:
-                {
-                    if (channel.IsDirect)
-                        await Reply("fennec no know that command :(");
-                    break;
-                }
+                if (channel.IsDirect)
+                    await Reply("fennec no know that command :(");
             }
         }
         catch (Exception e)
         {
-            _context.Logger.LogError(ResoCategory.Chat, $"Exception while running command {command}: {e}");
+            this._context.Logger.LogError(ResoCategory.Chat, $"Exception while running command {command}: {e}");
             await Reply("fennec fucked up. sowwy");
             await Reply($"{e.GetType()}: {e.Message}");
         }
 
         return;
-
-        Task Deny()
-        {
-            return Reply("Ah-ah-ah, you didn't say the magic word!");
-        }
         
         Task Reply(string content)
         {
-            return channel.Platform.SendMessageAsync(channel, content);
+            return channel.SendMessageAsync(content);
         }
     }
     

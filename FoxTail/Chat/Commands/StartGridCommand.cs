@@ -1,4 +1,5 @@
-﻿using FrooxEngine;
+﻿using FoxTail.Chat.CommandSupport;
+using FrooxEngine;
 
 namespace FoxTail.Chat.Commands;
 
