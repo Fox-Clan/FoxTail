@@ -24,7 +24,7 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
         Debug.Assert(this._worldManager != null);
     }
 
-    protected override async void OnMessage(MessageEventArgs wibi)
+    private async Task OnMessageAsync(MessageEventArgs wibi)
     {
         this._logger.LogTrace(ResoCategory.Stargate, "Received message from client: " + wibi.Data);
 
@@ -598,6 +598,21 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
                 }
             }
         }
+    }
+    
+    protected override void OnMessage(MessageEventArgs wibi)
+    {
+        Task.Run(async () =>
+        {
+            try
+            {
+                await OnMessageAsync(wibi);
+            }
+            catch (Exception e)
+            {
+                this._logger.LogError(ResoCategory.Stargate, $"General exception while trying to handle message '{wibi.Data}': {e}");
+            }
+        });
     }
 
     private static long UnixTimestamp => DateTimeOffset.UtcNow.ToUnixTimeSeconds();
