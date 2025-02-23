@@ -83,6 +83,11 @@ public class ChatCommandHelper : IDisposable
             IChatCommand? chatCommand = this._commands.FirstOrDefault(c => c.Name.Equals(command, StringComparison.InvariantCultureIgnoreCase));
             if (chatCommand != null)
             {
+                if (chatCommand.RequirePermission && !this.IsApproved(user))
+                {
+                    await Deny();
+                    return;
+                }
                 await chatCommand.InvokeAsync(this._context, channel, user, args);
                 return;
             }
@@ -95,41 +100,6 @@ public class ChatCommandHelper : IDisposable
 
             switch (command)
             {
-                case "start":
-                {
-                    if (!IsApproved(user))
-                    {
-                        await Deny();
-                        break;
-                    }
-
-                    string? urlStr = args.GetArg("url");
-                        
-                    if (urlStr == null)
-                    {
-                        await Reply("I need the record URL to start the world.");
-                        break;
-                    }
-
-                    string? knownUrlStr = _context.WorldConfig.GetKnownWorldUrlById(urlStr);
-                    if (knownUrlStr != null)
-                        urlStr = knownUrlStr;
-
-                    if (urlStr.StartsWith('h'))
-                        urlStr = urlStr.Replace("https://go.resonite.com/record", "resrec://");
-
-                    bool urlValid = Uri.TryCreate(urlStr, UriKind.Absolute, out Uri? uri);
-                    if (!urlValid || uri == null)
-                    {
-                        await Reply("I couldn't find that world alias. Try providing the record URL instead.");
-                        break;
-                    }
-                    
-                    await Reply("Starting that world for you, expect an invite shortly!");
-                    ManagedWorld world = await _context.WorldManager.StartWorld(uri, user);
-                    await world.InviteAndPromoteOwner(channel);
-                    break;
-                }
                 case "close":
                 {
                     if (!IsApproved(user))

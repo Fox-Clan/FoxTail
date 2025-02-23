@@ -4,4 +4,33 @@ public abstract class ArgContainer
 {
     public abstract string? GetArg(string name);
     public abstract string GetAllArgs();
+
+    public Uri? GetUri(string name, HeadlessContext? context = null)
+    {
+        string? uriStr = GetArg(name);
+        if (uriStr == null)
+            return null;
+
+        string? knownUriStr = context?.WorldConfig.GetKnownWorldUrlById(uriStr);
+        if (knownUriStr != null)
+            uriStr = knownUriStr;
+
+        Uri.TryCreate(uriStr, UriKind.Absolute, out Uri? uri);
+        return uri;
+    }
+
+    public Uri? GetRecordUrl(string name, HeadlessContext? context = null)
+    {
+        Uri? uri = GetUri(name, context);
+        if (uri == null)
+            return null;
+        
+        if (uri.Scheme.StartsWith('h'))
+            uri = new Uri(uri.ToString().Replace("https://go.resonite.com/record", "resrec://"));
+
+        if (uri.Scheme != "resrec")
+            return null;
+        
+        return uri;
+    }
 }

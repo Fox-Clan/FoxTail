@@ -8,5 +8,6 @@ public interface IChatCommand
 {
     public string Name { get; }
     public string HelpText { get; }
+    public bool RequirePermission { get; }
     public Task InvokeAsync(HeadlessContext context, IChatChannel channel, IChatUser user, ArgContainer args);
 }
