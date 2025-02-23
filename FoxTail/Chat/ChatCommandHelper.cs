@@ -100,78 +100,10 @@ public class ChatCommandHelper : IDisposable
 
             switch (command)
             {
-                case "save":
-                {
-                    if (!IsApproved(user))
-                    {
-                        await Deny();
-                        return;
-                    }
-                    
-                    ManagedWorld? world = this._context.WorldManager.FindWorldUserIn(user);
-                    if (world == null)
-                    {
-                        await Reply("I couldn't find the world you were in, so I can't save it. Try joining/focusing the world.");
-                        break;
-                    }
-                    
-                    await Reply("Saving world...");
-
-                    if (await this._context.WorldManager.SaveWorld(world))
-                    {
-                        await Reply("World saved and overwritten.");
-                    }
-                    else
-                    {
-                        await Reply("I can't save that world as I don't own that world. You can use 'Save As...' under Session to save it yourself.");
-                    }
-                    
-                    break;
-                }
                 case "promote":
                 case "admin":
                 {
                     await ReceiveCommand(channel, user, "role", new EnumeratingArgContainer("admin"));
-                    break;
-                }
-                case "role":
-                {
-                    if (!IsApproved(user))
-                    {
-                        await Deny();
-                        break;
-                    }
-                    
-                    ManagedWorld? world = this._context.WorldManager.FindWorldUserIn(user);
-                    if (world == null)
-                    {
-                        await Reply("I couldn't find the world you were in, so I can't set your role. Try joining/focusing the world.");
-                        break;
-                    }
-                    
-                    string? roleName = args.GetArg("role");
-                    if (roleName == null)
-                    {
-                        await Reply("I need the role to set you to. For example, you can do \"!role admin\".");
-                        break;
-                    }
-                    
-                    PermissionSet? role = world.World.Permissions.Roles.
-                        FirstOrDefault(r => r.RoleName.Value.Equals(roleName, StringComparison.InvariantCultureIgnoreCase));
-
-                    if (role == null)
-                    {
-                        await Reply("That world doesn't have that role. Did you make a typo?");
-                        break;
-                    }
-                    
-                    User worldUser = world.World.GetUserByUserId(user.UserId);
-
-                    world.World.RunSynchronously(() =>
-                    {
-                        worldUser.Role = role;
-                        worldUser.World.Permissions.AssignDefaultRole(worldUser, role);
-                    });
                     break;
                 }
                 case "gc":
