@@ -1,4 +1,5 @@
 ﻿using FoxTail.Chat.Platforms.Resonite;
+using FoxTail.Common;
 using FrooxEngine;
 using SkyFrost.Base;
 
@@ -26,9 +27,11 @@ public class ConsoleChatPlatform : IChatPlatform, IDisposable
 
                 ResoniteChatChannel channel = new(this, message);
                 ConsoleChatUser user = new(this);
-
+                
                 await _context.CommandHelper.ReceiveCommand(channel, user, ChatCommandHelper.ParseSimpleCommand(line));
             }
+            
+            this._context.Logger.LogTrace(ResoCategory.Chat, "Console input thread exited");
         });
         thread.Name = "ConsoleChatPlatform Input Thread";
         thread.Start();

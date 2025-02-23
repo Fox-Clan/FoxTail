@@ -3,6 +3,7 @@ using FoxTail.Chat.Platforms.Resonite;
 using FoxTail.Common;
 using FrooxEngine;
 using SkyFrost.Base;
+using User = FrooxEngine.User;
 
 namespace FoxTail.Worlds;
 
@@ -84,7 +85,31 @@ public class FoxWorldManager
 
     public async Task CloseWorld(ManagedWorld world)
     {
-        await Userspace.ExitWorld(world.World);
+        this._context.Logger.LogTrace(ResoCategory.WorldManager, $"Closing {world.Name}...");
+        if (world.World.UserCount > 1)
+        {
+            world.World.RunSynchronously((Action) (() =>
+            {
+                foreach (User user in world.World.AllUsers)
+                {
+                    this._context.Logger.LogTrace(ResoCategory.WorldManager, $"Kicking out {user.Name}...");
+                    if (!user.IsLocalUser)
+                        user.Disconnect();
+                }
+            }));
+
+            this._context.Logger.LogTrace(ResoCategory.WorldManager, "Waiting for users to disconnect...");
+            await world.World.Coroutines.StartTask(async w =>
+            {
+                DateTime start = DateTime.UtcNow;
+                while (w.UserCount > 1 && (DateTime.UtcNow - start).TotalSeconds < 5.0)
+                    await new NextUpdate();
+            }, world.World);
+        }
+        
+        this._context.Logger.LogTrace(ResoCategory.WorldManager, "Destroying world!");
+        world.World.Destroy();
+        
         this._worlds.Remove(world);
         this._context.Logger.LogInfo(ResoCategory.WorldManager, $"Unregistered world {world}.");
     }
