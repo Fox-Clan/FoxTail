@@ -598,6 +598,11 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
                 }
             }
         }
+        
+        #if DEBUG
+        if (this._db.ChangeTracker.HasChanges())
+            throw new Exception("OnMessage exited without saved changed to the database");
+        #endif
     }
     
     protected override void OnMessage(MessageEventArgs wibi)
