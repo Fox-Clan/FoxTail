@@ -19,6 +19,8 @@ internal static class Program
 
         StargateConfiguration config = new();
         config.WebsocketHostUrl = wsUri;
+        config.WebsocketEnabled = true;
+        config.BunkumEnabled = true;
 
         Logger logger = new(new LoggerConfiguration()
         {

@@ -39,10 +39,10 @@ public class StargateServer : IDisposable
             db.Database.Migrate();
         }
         
-       // if(this._config.WebsocketEnabled)
+        if(this._config.WebsocketEnabled)
             this._wsServer.Start();
         
-        //if(this._config.BunkumEnabled)
+        if(this._config.BunkumEnabled)
             this._bunkumServer.Start();
         
         Thread dbCleanThread = new(CleanStaleDb)
