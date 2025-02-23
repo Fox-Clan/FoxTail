@@ -100,26 +100,10 @@ public class ChatCommandHelper : IDisposable
 
             switch (command)
             {
-                case "promote":
+                case "promote": // TODO: aliases
                 case "admin":
                 {
                     await ReceiveCommand(channel, user, "role", new EnumeratingArgContainer("admin"));
-                    break;
-                }
-                case "gc":
-                {
-                    // restrict to those who know what this means
-                    if (user.UserId != "U-1XNdZruECCu" && user.UserId != "U-1YIjc7KyPL6")
-                    {
-                        await Deny();
-                        return;
-                    }
-
-                    await Reply("Collecting...");
-                    Stopwatch sw = Stopwatch.StartNew();
-                    GC.Collect();
-                    sw.Stop();
-                    await Reply($"Garbage collection took {sw.ElapsedMilliseconds}ms.");
                     break;
                 }
                 case "allowurl":

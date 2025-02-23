@@ -91,7 +91,10 @@ internal static class Program
         Context.Runner = Runner;
         
         await Runner.InitializeEngineAsync();
-        await Runner.StartFullInitTasksAsync();
+        await Runner.StartFullInitTasksAsync(); // engine is mostly up, setup foxtail stuff
+        
+        // since loading is complete, perform a big gc to clear out all the loading stuff
+        GC.Collect(GC.MaxGeneration, GCCollectionMode.Aggressive, true, true);
 
         // this blocks the thread until the engine exits.
         await Runner.WaitForEngineExitAsync();
