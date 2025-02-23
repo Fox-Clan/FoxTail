@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Frozen;
+using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 using FoxTail.Chat.CommandSupport;
 using FoxTail.Chat.Platforms;
@@ -16,7 +18,24 @@ public class ChatCommandHelper : IDisposable
     private readonly HeadlessContext _context;
 
     private readonly List<IChatPlatform> _platforms = [];
+    private readonly FrozenSet<IChatCommand> _commands;
+    
 
+    public ChatCommandHelper(HeadlessContext context)
+    {
+        this._context = context;
+        this._commands = Assembly.GetExecutingAssembly()
+            .GetTypes()
+            .Where(t => t.IsClass && t.IsAssignableTo(typeof(IChatCommand)))
+            .Select(t => (IChatCommand)Activator.CreateInstance(t)!)
+            .ToFrozenSet();
+    }
+
+    public void AddPlatform(IChatPlatform platform)
+    {
+        this._platforms.Add(platform);
+    }
+    
     public bool IsApproved(IChatUser user)
     {
         if (user.UserId == "console")
@@ -29,16 +48,6 @@ public class ChatCommandHelper : IDisposable
             return true;
 
         return false;
-    }
-
-    public ChatCommandHelper(HeadlessContext context)
-    {
-        _context = context;
-    }
-
-    public void AddPlatform(IChatPlatform platform)
-    {
-        _platforms.Add(platform);
     }
 
     public static (string command, EnumeratingArgContainer args) ParseSimpleCommand(string line)
@@ -71,13 +80,21 @@ public class ChatCommandHelper : IDisposable
         // actually handle the command
         try
         {
+            IChatCommand? chatCommand = this._commands.FirstOrDefault(c => c.Name.Equals(command, StringComparison.InvariantCultureIgnoreCase));
+            if (chatCommand != null)
+            {
+                await chatCommand.InvokeAsync(this._context, channel, user, args);
+                return;
+            }
+            // else // TODO: uncomment when all commands ported
+            // {
+            //     if (channel.IsDirect)
+            //         await Reply("fennec no know that command :(");
+            //     return;
+            // }
+
             switch (command)
             {
-                case "echo":
-                {
-                    await Reply(args.GetAllArgs());
-                    break;
-                }
                 case "grid":
                 {
                     await Reply("Starting a grid for you, expect an invite shortly!");
