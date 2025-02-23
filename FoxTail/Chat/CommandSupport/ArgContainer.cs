@@ -1,5 +1,6 @@
 ﻿using FoxTail.Chat.Platforms;
 using FoxTail.Worlds;
+using SkyFrost.Base;
 
 namespace FoxTail.Chat.CommandSupport;
 
@@ -57,5 +58,18 @@ public abstract class ArgContainer
             return context.WorldManager.FindWorldUserIn(user);
 
         return context.WorldManager.FindWorldById(worldId.Value);
+    }
+
+    public async Task<User?> GetCloudUserAsync(string name, HeadlessContext context)
+    {
+        string? username = GetArg(name);
+        if (username == null)
+            return null;
+
+        CloudResult<User>? user = await context.Engine.Cloud.Users.GetUserByName(username);
+        if (user == null)
+            return null;
+
+        return user.Entity;
     }
 }
