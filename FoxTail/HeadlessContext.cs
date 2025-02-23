@@ -1,4 +1,5 @@
 ﻿using FoxTail.Chat;
+using FoxTail.Common;
 using FoxTail.Configuration;
 using FoxTail.EngineIntegration;
 using FoxTail.Worlds;

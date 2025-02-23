@@ -2,6 +2,7 @@
 using FoxTail.Chat.Console;
 using FoxTail.Chat.Discord;
 using FoxTail.Chat.Resonite;
+using FoxTail.Common;
 
 namespace FoxTail.EngineIntegration.LoadManagement.Tasks;
 

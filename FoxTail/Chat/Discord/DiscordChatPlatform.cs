@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using FoxTail.Common;
 using FrooxEngine;
 using NotEnoughLogs;
 using SkyFrost.Base;

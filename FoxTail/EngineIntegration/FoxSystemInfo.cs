@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Elements.Assets;
+using FoxTail.Common;
 using FoxTail.Timing;
 using FrooxEngine;
 using Hardware.Info;

@@ -1,4 +1,4 @@
-﻿namespace FoxTail;
+﻿namespace FoxTail.Common;
 
 public enum ResoCategory : byte
 {

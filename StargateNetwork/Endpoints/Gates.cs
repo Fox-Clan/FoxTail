@@ -4,7 +4,7 @@ using Bunkum.Listener.Protocol;
 using Bunkum.Protocols.Http;
 using StargateNetwork.Types;
 
-namespace StargateNetwork.endpoints;
+namespace StargateNetwork.Endpoints;
 
 public class GateEndpoints : EndpointGroup
 {

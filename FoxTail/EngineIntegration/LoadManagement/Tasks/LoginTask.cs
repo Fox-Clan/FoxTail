@@ -1,4 +1,5 @@
-﻿using SkyFrost.Base;
+﻿using FoxTail.Common;
+using SkyFrost.Base;
 
 namespace FoxTail.EngineIntegration.LoadManagement.Tasks;
 

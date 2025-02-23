@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Loader;
 using Elements.Core;
+using FoxTail.Common;
 using FoxTail.Configuration;
 using FoxTail.EngineIntegration;
 using FoxTail.EngineIntegration.LoadManagement.Tasks;
