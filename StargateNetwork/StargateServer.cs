@@ -12,11 +12,11 @@ public class StargateServer : IDisposable
     internal static StargateServer Instance { get; private set; }
 
     internal readonly Logger Logger;
+    internal readonly IStargateWorldManager WorldManager;
     
     private readonly WebSocketServer _wsServer;
     private readonly StargateBunkumServer _bunkumServer;
     private readonly StargateConfiguration _config;
-    private readonly IStargateWorldManager _worldManager;
 
     private bool _shouldRun;
 
@@ -26,7 +26,7 @@ public class StargateServer : IDisposable
 
         this.Logger = logger;
         this._config = config;
-        this._worldManager = worldManager;
+        this.WorldManager = worldManager;
         
         this._bunkumServer = new StargateBunkumServer();
         

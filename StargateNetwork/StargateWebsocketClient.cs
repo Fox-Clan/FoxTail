@@ -2,6 +2,7 @@
 using FoxTail.Common;
 using Newtonsoft.Json;
 using StargateNetwork.Types;
+using StargateNetwork.Worlds;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 using Logger = NotEnoughLogs.Logger;
@@ -12,11 +13,15 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
 {
     private readonly StargateContext _db = new();
     private readonly Logger _logger;
+    private readonly IStargateWorldManager _worldManager;
 
     public StargateWebsocketClient()
     {
         this._logger = StargateServer.Instance.Logger;
+        this._worldManager = StargateServer.Instance.WorldManager;
+        
         Debug.Assert(this._logger != null);
+        Debug.Assert(this._worldManager != null);
     }
 
     protected override async void OnMessage(MessageEventArgs wibi)
@@ -329,20 +334,18 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
                         break;
                     }
 
-                    //if gate is persistent make sure the world is up and if not start it and wait for it to fully load //TODO
+                    //if gate is persistent, ensure the world is up
                     if (requestedGate.IsPersistent)
                     {
-                        /*
-                        if (!(requestedGate.world_record == //function that returns true if the world is already up))
-                        {
-                            this._logger.LogTrace(ResoCategory.Stargate, "Requested gate is in closed world. starting...")
-                            //function that starts world
-                            //waits for world to start
+                        Uri worldRecordUri = new(requestedGate.WorldRecord);
+                         if (!this._worldManager.IsWorldRunning(worldRecordUri))
+                         {
+                             this._logger.LogTrace(ResoCategory.Stargate, "Requested gate is in closed world. starting...");
+                             await this._worldManager.StartWorld(worldRecordUri);
 
-                            //updates gate info
-                            requestedGate = await db.FindGateByAddress(requestedAddress, db);
-                        }
-                        */
+                             //updates gate info
+                             // TODO: (jvy) find out what the fuck the above comment means
+                         }
                     }
 
 
