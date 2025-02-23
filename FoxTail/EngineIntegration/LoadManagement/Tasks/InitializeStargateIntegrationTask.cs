@@ -1,4 +1,5 @@
 ﻿using StargateNetwork;
+using StargateNetwork.Worlds.Dummy;
 
 namespace FoxTail.EngineIntegration.LoadManagement.Tasks;
 
@@ -14,7 +15,7 @@ public class InitializeStargateIntegrationTask : InitTask
             return;
         }
 
-        StargateServer server = new(context.Logger, context.StargateConfig);
+        StargateServer server = new(context.Logger, context.StargateConfig, new DummyStargateWorldManager());
         server.Start();
 
         context.StargateServer = server;

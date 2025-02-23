@@ -12,4 +12,6 @@ public enum ResoCategory : byte
     WorldInit,
     WorldManager,
     Config,
+    Stargate,
+    StargateWorld,
 }

@@ -1,5 +1,6 @@
 ﻿using NotEnoughLogs;
 using NotEnoughLogs.Behaviour;
+using StargateNetwork.Worlds.Dummy;
 
 namespace StargateNetwork;
 
@@ -26,7 +27,7 @@ internal static class Program
             MaxLevel = LogLevel.Trace,
         });
 
-        StargateServer server = new(logger, config);
+        StargateServer server = new(logger, config, new DummyStargateWorldManager());
         server.Start();
 
         Console.ReadKey();

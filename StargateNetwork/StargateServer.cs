@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NotEnoughLogs;
 using StargateNetwork.Types;
+using StargateNetwork.Worlds;
 using WebSocketSharp.Server;
 
 namespace StargateNetwork;
@@ -14,15 +15,17 @@ public class StargateServer : IDisposable
     private readonly WebSocketServer _wsServer;
     private readonly StargateBunkumServer _bunkumServer;
     private readonly StargateConfiguration _config;
+    private readonly IStargateWorldManager _worldManager;
 
     private bool _shouldRun;
 
-    public StargateServer(Logger logger, StargateConfiguration config)
+    public StargateServer(Logger logger, StargateConfiguration config, IStargateWorldManager worldManager)
     {
         Instance = this;
 
         this.Logger = logger;
         this._config = config;
+        this._worldManager = worldManager;
         
         this._bunkumServer = new StargateBunkumServer();
         
