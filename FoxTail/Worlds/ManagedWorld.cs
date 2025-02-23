@@ -55,14 +55,9 @@ public class ManagedWorld
         if (this.Owner == null)
             throw new InvalidOperationException("This world does not have an owner.");
 
+        await InviteUser(channel, this.Owner);
         await this.World.Coroutines.StartTask(async () =>
         {
-            this.World.AllowUserToJoin(this.Owner.UserId);
-            while (!this.World.SessionURLs.Any())
-                await new NextUpdate();
-
-            _ = Task.Run(async () => await channel.Platform.SendInviteAsync(channel, this.World));
-            
             while (!this.World.Permissions.PermissionHandlingInitialized)
                 await new NextUpdate();
 
@@ -70,6 +65,18 @@ public class ManagedWorld
             {
                 this.World.Permissions.DefaultUserPermissions[this.Owner.UserId] = this.World.Permissions.HighestRole;
             });
+        });
+    }
+
+    public async Task InviteUser(IChatChannel channel, IChatUser user)
+    {
+        await this.World.Coroutines.StartTask(async () =>
+        {
+            this.World.AllowUserToJoin(user.UserId);
+            while (!this.World.SessionURLs.Any())
+                await new NextUpdate();
+            
+            _ = Task.Run(async () => await channel.Platform.SendInviteAsync(channel, this.World));
         });
     }
 
