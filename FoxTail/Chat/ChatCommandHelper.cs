@@ -26,7 +26,7 @@ public class ChatCommandHelper : IDisposable
         this._context = context;
         this._commands = Assembly.GetExecutingAssembly()
             .GetTypes()
-            .Where(t => t.IsClass && t.IsAssignableTo(typeof(IChatCommand)))
+            .Where(t => t.IsClass && !t.IsAbstract && t.IsAssignableTo(typeof(IChatCommand)))
             .Select(t => (IChatCommand)Activator.CreateInstance(t)!)
             .ToFrozenSet();
     }
@@ -95,20 +95,6 @@ public class ChatCommandHelper : IDisposable
 
             switch (command)
             {
-                case "grid":
-                {
-                    await Reply("Starting a grid for you, expect an invite shortly!");
-                    ManagedWorld world = await _context.WorldManager.StartWorld(WorldPresets.Grid, user);
-                    await world.InviteAndPromoteOwner(channel);
-                    break;
-                }
-                case "platform":
-                {
-                    await Reply("Starting a platform for you, expect an invite shortly!");
-                    ManagedWorld world = await _context.WorldManager.StartWorld(WorldPresets.SimplePlatform, user);
-                    await world.InviteAndPromoteOwner(channel);
-                    break;
-                }
                 case "start":
                 {
                     if (!IsApproved(user))
