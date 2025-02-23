@@ -618,7 +618,8 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
             case "requestPersistence":
             {
                 this._logger.LogTrace(ResoCategory.Stargate, "Stargate request persistence...");
-                Stargate? gate = await this._db.FindGateByAddress(message.gate_address);
+                string address = message.gate_address;
+                Stargate? gate = await this._db.FindGateByAddress(address);
 
                 if (gate == null)
                 {
