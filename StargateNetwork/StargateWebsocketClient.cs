@@ -102,6 +102,7 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
                             gate.PublicGate = message.@public;
                             
                             await this._db.SaveChangesAsync();
+                            Send("{code: 200, message: \"Address accepted\" }");
                             break;
                         }
                         
@@ -360,9 +361,7 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
                          {
                              this._logger.LogTrace(ResoCategory.Stargate, "Requested gate is in closed world. starting...");
                              await this._worldManager.StartWorld(worldRecordUri);
-
-                             //updates gate info
-                             // TODO: (jvy) find out what the fuck the above comment means
+                             await Task.Delay(1000); //TODO make this more robust by sending a dynamic impulse to the auto-gateSetup script ingame 
                          }
                     }
 
