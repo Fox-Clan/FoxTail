@@ -42,6 +42,7 @@ public class HeadlessContext : IDisposable
         _disposed = true;
         Logger.LogInfo(ResoCategory.Runner, "Disposing HeadlessContext.");
         
+        FoxBunkumServer.Stop();
         StargateServer.Dispose();
         CommandHelper?.Dispose();
         Engine?.Dispose();

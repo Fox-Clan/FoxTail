@@ -1,10 +1,8 @@
 ﻿using System.Net.Http.Headers;
-using System.Security.Cryptography;
 using Bunkum.Core.Services;
 using FoxTail.Common;
 using FoxTail.LoveAuth.Crypto;
 using FoxTail.LoveAuth.Types;
-using JWT.Algorithms;
 using JWT.Builder;
 using JWT.Exceptions;
 using Newtonsoft.Json;

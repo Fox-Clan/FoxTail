@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using Elements.Core;
 using FoxTail.Common;
 using FoxTail.Common.Timing;
 using FoxTail.Configuration;

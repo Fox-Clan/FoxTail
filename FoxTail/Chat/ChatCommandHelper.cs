@@ -1,8 +1,5 @@
-﻿using System.Collections.Frozen;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Text;
-using Elements.Core;
-using FoxTail.Chat.Resonite;
 using FoxTail.Common;
 using FoxTail.Worlds;
 using FrooxEngine;

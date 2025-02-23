@@ -1,21 +1,15 @@
 ﻿using System.Reflection;
-using Bunkum.Core;
-using Bunkum.Protocols.Http;
+using FoxTail.Common;
 using FoxTail.LoveAuth.Services;
-using NotEnoughLogs;
-using NotEnoughLogs.Behaviour;
 
-BunkumServer server = new BunkumHttpServer(new LoggerConfiguration()
+namespace FoxTail.LoveAuth;
+
+internal static class Program
 {
-    Behaviour = new QueueLoggingBehaviour(),
-    MaxLevel = LogLevel.Trace
-});
-
-server.Initialize = s =>
-{
-    s.AddService<LoveAuthService>();
-    s.DiscoverEndpointsFromAssembly(Assembly.GetExecutingAssembly());
-};
-
-server.Start();
-await Task.Delay(-1);
+    internal static async Task Main(string[] args)
+    {
+        FoxLoveAuth.SetupBunkum();
+        FoxBunkumServer.Start();
+        await Task.Delay(-1);
+    }
+}

@@ -10,6 +10,8 @@
         <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="NotEnoughLogs" Version="2.0.3" />
+        <PackageReference Include="Bunkum" Version="4.8.1" />
+        <PackageReference Include="Bunkum.Protocols.Http" Version="4.8.1" />
     </ItemGroup>
 
 </Project>
