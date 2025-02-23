@@ -1,4 +1,5 @@
-﻿using StargateNetwork;
+﻿using FoxTail.Common;
+using StargateNetwork;
 using StargateNetwork.Worlds.Dummy;
 
 namespace FoxTail.EngineIntegration.LoadManagement.Tasks;
@@ -11,7 +12,7 @@ public class InitializeStargateIntegrationTask : InitTask
     {
         if (!context.StargateConfig.StargateServerIntegration)
         {
-            context.Logger.LogInfo("Stargate", "Stargate integration disabled, skipping init.");
+            context.Logger.LogInfo(ResoCategory.Stargate, "Stargate integration disabled, skipping init.");
             return;
         }
 

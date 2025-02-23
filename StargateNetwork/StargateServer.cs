@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FoxTail.Common;
+using Microsoft.EntityFrameworkCore;
 using NotEnoughLogs;
 using StargateNetwork.Types;
 using StargateNetwork.Worlds;
@@ -78,7 +79,7 @@ public class StargateServer : IDisposable
                         if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() - gate.UpdateDate <= 60) continue;
 
                         db.Remove(gate);
-                        Logger.LogTrace("Stargate", "Cleaned stale stargate from database");
+                        Logger.LogTrace(ResoCategory.Stargate, "Cleaned stale stargate from database");
                     }
 
                     db.SaveChanges();
@@ -89,7 +90,7 @@ public class StargateServer : IDisposable
         }
         catch (Exception e)
         {
-            Logger.LogError("Stargate", "Exception caught when cleaning state gates: " + e);
+            Logger.LogError(ResoCategory.Stargate, "Exception caught when cleaning state gates: " + e);
         }
     }
 

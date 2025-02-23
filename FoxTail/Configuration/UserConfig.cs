@@ -1,4 +1,5 @@
-﻿using FoxTail.Users;
+﻿using FoxTail.Common.Configuration;
+using FoxTail.Users;
 using HarmonyLib;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;

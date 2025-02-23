@@ -1,4 +1,5 @@
-﻿using FoxTail.EngineIntegration.LoadManagement;
+﻿using FoxTail.Common.Configuration;
+using FoxTail.EngineIntegration.LoadManagement;
 using FoxTail.Worlds;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;

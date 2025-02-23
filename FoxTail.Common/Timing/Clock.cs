@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
-using Elements.Core;
 
-namespace FoxTail.Timing;
+namespace FoxTail.Common.Timing;
 
 public abstract class Clock
 {
@@ -14,7 +13,7 @@ public abstract class Clock
     public virtual double CurrentTime { get; protected set; }
     protected virtual double LastFrameTime { get; set; }
     
-    protected double SourceTime => _stopwatch.GetElapsedMilliseconds();
+    protected double SourceTime => _stopwatch.ElapsedTicks / (double) Stopwatch.Frequency * 1000.0;
     public double ElapsedFrameTime => CurrentTime - LastFrameTime;
     
     private const int FpsCalculationInterval = 250;

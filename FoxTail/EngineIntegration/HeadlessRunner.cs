@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 using Elements.Core;
 using FoxTail.Common;
+using FoxTail.Common.Timing;
 using FoxTail.Configuration;
 using FoxTail.EngineIntegration.LoadManagement;
-using FoxTail.Timing;
 using FrooxEngine;
 
 namespace FoxTail.EngineIntegration;

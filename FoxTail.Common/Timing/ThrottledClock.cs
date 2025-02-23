@@ -6,7 +6,7 @@
 // See the original code here on GitHub:
 // https://github.com/ppy/osu-framework/blob/527d836d37009ce0b84521ad4b74914acbe89927/osu.Framework/Timing/ThrottledFrameClock.cs
 
-namespace FoxTail.Timing;
+namespace FoxTail.Common.Timing;
 
 public sealed class ThrottledClock : Clock
 {

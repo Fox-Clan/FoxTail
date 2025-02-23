@@ -1,4 +1,4 @@
-﻿namespace FoxTail.Configuration;
+﻿namespace FoxTail.Common.Configuration;
 
 public interface IConfigWithExampleLayout
 {

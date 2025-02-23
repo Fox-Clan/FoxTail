@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Loader;
 using Elements.Core;
 using FoxTail.Common;
+using FoxTail.Common.Configuration;
 using FoxTail.Configuration;
 using FoxTail.EngineIntegration;
 using FoxTail.EngineIntegration.LoadManagement.Tasks;
@@ -43,10 +44,10 @@ internal static class Program
         
         Context.Logger.LogInfo(ResoCategory.Config, "Loading configurations...");
         bool createdNewConfig = false;
-        Context.Config = ConfigHelper.GetOrCreateConfig<FoxTailConfig>(Context, "foxtail.json", ref createdNewConfig);
-        Context.WorldConfig = ConfigHelper.GetOrCreateConfig<WorldConfig>(Context, "worlds.json", ref createdNewConfig);
-        Context.UserConfig = ConfigHelper.GetOrCreateConfig<UserConfig>(Context, "users.json", ref createdNewConfig);
-        Context.StargateConfig = ConfigHelper.GetOrCreateConfig<StargateConfiguration>(Context, "stargate.json", ref createdNewConfig);
+        Context.Config = ConfigHelper.GetOrCreateConfig<FoxTailConfig>(Context.Logger, "foxtail.json", ref createdNewConfig);
+        Context.WorldConfig = ConfigHelper.GetOrCreateConfig<WorldConfig>(Context.Logger, "worlds.json", ref createdNewConfig);
+        Context.UserConfig = ConfigHelper.GetOrCreateConfig<UserConfig>(Context.Logger, "users.json", ref createdNewConfig);
+        Context.StargateConfig = ConfigHelper.GetOrCreateConfig<StargateConfiguration>(Context.Logger, "stargate.json", ref createdNewConfig);
 
         if (createdNewConfig)
         {
