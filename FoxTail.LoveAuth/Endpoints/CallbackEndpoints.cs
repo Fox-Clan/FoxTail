@@ -30,7 +30,12 @@ public class CallbackEndpoints : EndpointGroup
         {
             return new Response(e.Message, ContentType.Plaintext, HttpStatusCode.Unauthorized);
         }
+
+        if (user.DiscordId == null)
+            return new Response("Please link your Discord account at https://auth.resonite.love!", ContentType.Plaintext, HttpStatusCode.Unauthorized);
         
-        return new Response(user, ContentType.Json);
+        Console.WriteLine($"{user.ResoniteUserId}'s Discord id is '" + user.DiscordId + "'!");
+        
+        return new Response("Success! You may now close this tab.");
     }
 }
