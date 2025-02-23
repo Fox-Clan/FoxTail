@@ -6,7 +6,7 @@ using NotEnoughLogs;
 using SkyFrost.Base;
 using UserStatus = Discord.UserStatus;
 
-namespace FoxTail.Chat.Discord;
+namespace FoxTail.Chat.Platforms.Discord;
 
 public class DiscordChatPlatform : IChatPlatform, IDisposable
 {

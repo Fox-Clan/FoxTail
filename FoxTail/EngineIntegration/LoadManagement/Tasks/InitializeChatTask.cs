@@ -1,7 +1,7 @@
 ﻿using FoxTail.Chat;
-using FoxTail.Chat.Console;
-using FoxTail.Chat.Discord;
-using FoxTail.Chat.Resonite;
+using FoxTail.Chat.Platforms.Console;
+using FoxTail.Chat.Platforms.Discord;
+using FoxTail.Chat.Platforms.Resonite;
 using FoxTail.Common;
 
 namespace FoxTail.EngineIntegration.LoadManagement.Tasks;

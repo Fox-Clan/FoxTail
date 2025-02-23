@@ -1,9 +1,9 @@
-﻿using FoxTail.Chat.Resonite;
+﻿using FoxTail.Chat.Platforms.Resonite;
 using FrooxEngine;
 using SkyFrost.Base;
 using User = SkyFrost.Base.User;
 
-namespace FoxTail.Chat.Console;
+namespace FoxTail.Chat.Platforms.Console;
 
 public class ConsoleChatPlatform : IChatPlatform, IDisposable
 {

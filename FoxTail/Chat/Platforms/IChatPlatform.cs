@@ -1,6 +1,6 @@
 ﻿using FrooxEngine;
 
-namespace FoxTail.Chat;
+namespace FoxTail.Chat.Platforms;
 
 public interface IChatPlatform
 {
