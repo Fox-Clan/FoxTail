@@ -86,8 +86,26 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
 
                     if (gate != null)
                     {
-                        bool overRide = false;
+                        if (gate.IsPersistent)
+                        {
+                            this._logger.LogTrace(ResoCategory.Stargate, "Updating persistent gate...");
 
+                            gate.Id = ID;
+                            gate.SessionUrl = message.session_id;
+                            gate.ActiveUsers = message.current_users;
+                            gate.MaxUsers = message.max_users;
+                            gate.GateStatus = "IDLE";
+                            gate.SessionName = message.gate_name;
+                            gate.OwnerName = message.host_id;
+                            gate.UpdateDate = UnixTimestamp;
+                            gate.DialedGateId = "";
+                            gate.PublicGate = message.@public;
+                            
+                            await this._db.SaveChangesAsync();
+                            break;
+                        }
+                        
+                        bool overRide = false;
                         if (UnixTimestamp - gate.UpdateDate > 60)
                         {
                             this._logger.LogTrace(ResoCategory.Stargate, "database entry stale, overriding...");
