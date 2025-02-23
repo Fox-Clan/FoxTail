@@ -614,6 +614,29 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
                     break;
                 }
             }
+
+            case "requestPersistence":
+            {
+                this._logger.LogTrace(ResoCategory.Stargate, "Stargate request persistence...");
+                Stargate? gate = await this._db.FindGateByAddress(message.gate_address);
+
+                if (gate == null)
+                {
+                    this._logger.LogTrace(ResoCategory.Stargate, "Stargate not found when requesting persistence!");
+                    Send("404");
+                    break;
+                }
+                
+                gate.IsPersistent = true;
+                gate.WorldRecord = message.WorldRecord;
+                gate.UpdateDate = UnixTimestamp;
+                await this._db.SaveChangesAsync();
+                
+                this._logger.LogTrace(ResoCategory.Stargate, "Stargate set as persistent");
+                Send("200");
+                
+                break;
+            }
         }
         
         #if DEBUG
