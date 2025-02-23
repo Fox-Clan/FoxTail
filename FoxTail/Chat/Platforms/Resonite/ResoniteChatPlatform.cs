@@ -1,7 +1,7 @@
 ﻿using FrooxEngine;
 using SkyFrost.Base;
 
-namespace FoxTail.Chat.Resonite;
+namespace FoxTail.Chat.Platforms.Resonite;
 
 public class ResoniteChatPlatform : IChatPlatform
 {
@@ -16,7 +16,7 @@ public class ResoniteChatPlatform : IChatPlatform
             ResoniteChatChannel channel = new(this, message);
             ResoniteChatUser user = new(this, (await this._context.Engine.Cloud.Users.GetUserCached(message.SenderId)).Entity);
 
-            await this._context.CommandHelper.ReceiveCommand(channel, user, message.Content);
+            await this._context.CommandHelper.ReceiveCommand(channel, user, ChatCommandHelper.ParseSimpleCommand(message.Content));
         };
     }
 

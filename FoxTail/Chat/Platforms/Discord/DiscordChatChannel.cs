@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 
-namespace FoxTail.Chat.Discord;
+namespace FoxTail.Chat.Platforms.Discord;
 
 public class DiscordChatChannel : IChatChannel
 {

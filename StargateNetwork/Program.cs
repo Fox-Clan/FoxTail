@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using FoxTail.Common;
+﻿using FoxTail.Common;
 using NotEnoughLogs;
 using NotEnoughLogs.Behaviour;
 using StargateNetwork.Worlds.Dummy;

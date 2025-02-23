@@ -6,7 +6,7 @@ using NotEnoughLogs;
 using SkyFrost.Base;
 using UserStatus = Discord.UserStatus;
 
-namespace FoxTail.Chat.Discord;
+namespace FoxTail.Chat.Platforms.Discord;
 
 public class DiscordChatPlatform : IChatPlatform, IDisposable
 {
@@ -83,7 +83,7 @@ public class DiscordChatPlatform : IChatPlatform, IDisposable
         DiscordChatChannel channel = new(this, message.Channel);
         DiscordChatUser user = new(this, message.Author);
 
-        _ = Task.Run(async () => await this._context.CommandHelper.ReceiveCommand(channel, user, message.Content));
+        _ = Task.Run(async () => await this._context.CommandHelper.ReceiveCommand(channel, user, ChatCommandHelper.ParseSimpleCommand(message.Content)));
     }
 
     private string _lastCustomStatus = "";

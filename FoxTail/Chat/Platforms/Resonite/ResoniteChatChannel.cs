@@ -1,6 +1,6 @@
 ﻿using SkyFrost.Base;
 
-namespace FoxTail.Chat.Resonite;
+namespace FoxTail.Chat.Platforms.Resonite;
 
 public class ResoniteChatChannel : IChatChannel
 {

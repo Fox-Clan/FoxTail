@@ -1,9 +1,9 @@
-﻿using FoxTail.Chat.Resonite;
+﻿using FoxTail.Chat.Platforms.Resonite;
+using FoxTail.Common;
 using FrooxEngine;
 using SkyFrost.Base;
-using User = SkyFrost.Base.User;
 
-namespace FoxTail.Chat.Console;
+namespace FoxTail.Chat.Platforms.Console;
 
 public class ConsoleChatPlatform : IChatPlatform, IDisposable
 {
@@ -22,21 +22,16 @@ public class ConsoleChatPlatform : IChatPlatform, IDisposable
                 Message message = new()
                 {
                     Content = line,
-                    SenderId = "console",
+                    SenderId = "console"
                 };
 
                 ResoniteChatChannel channel = new(this, message);
-                ResoniteChatUser user = new(this, new User
-                {
-                    Username = "console",
-                    Id = "console",
-                });
-
-                if (!line.StartsWith('!'))
-                    line = '!' + line;
-
-                await _context.CommandHelper.ReceiveCommand(channel, user, line);
+                ConsoleChatUser user = new(this);
+                
+                await _context.CommandHelper.ReceiveCommand(channel, user, ChatCommandHelper.ParseSimpleCommand(line));
             }
+            
+            this._context.Logger.LogTrace(ResoCategory.Chat, "Console input thread exited");
         });
         thread.Name = "ConsoleChatPlatform Input Thread";
         thread.Start();
