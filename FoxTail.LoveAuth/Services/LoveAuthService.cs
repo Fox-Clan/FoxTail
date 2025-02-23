@@ -6,6 +6,7 @@ using FoxTail.LoveAuth.Crypto;
 using FoxTail.LoveAuth.Types;
 using JWT.Algorithms;
 using JWT.Builder;
+using JWT.Exceptions;
 using Newtonsoft.Json;
 using NotEnoughLogs;
 
@@ -59,6 +60,14 @@ public class LoveAuthService : EndpointService
         if (json == null)
             return null;
 
-        return JsonConvert.DeserializeObject<LoveAuthUserResponse>(json);
+        LoveAuthUserResponse? user = JsonConvert.DeserializeObject<LoveAuthUserResponse>(json);
+        if (user == null)
+            return null;
+        
+        // TODO: check user.audience
+        if (DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() < user.Expiration)
+            throw new TokenExpiredException("User has expired.");
+
+        return user;
     }
 }
