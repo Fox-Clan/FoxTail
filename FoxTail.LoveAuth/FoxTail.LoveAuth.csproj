@@ -12,8 +12,10 @@
     </ItemGroup>
     
     <ItemGroup>
+        <PackageReference Include="BouncyCastle.Cryptography" Version="2.5.1" />
         <PackageReference Include="Bunkum" Version="4.8.1" />
         <PackageReference Include="Bunkum.Protocols.Http" Version="4.8.1" />
+        <PackageReference Include="JWT" Version="11.0.0" />
     </ItemGroup>
 
 </Project>

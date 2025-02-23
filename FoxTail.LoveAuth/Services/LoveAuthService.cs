@@ -1,7 +1,11 @@
 ﻿using System.Net.Http.Headers;
+using System.Security.Cryptography;
 using Bunkum.Core.Services;
 using FoxTail.Common;
+using FoxTail.LoveAuth.Crypto;
 using FoxTail.LoveAuth.Types;
+using JWT.Algorithms;
+using JWT.Builder;
 using Newtonsoft.Json;
 using NotEnoughLogs;
 
@@ -15,8 +19,7 @@ public class LoveAuthService : EndpointService
         DefaultRequestHeaders = { UserAgent = { new ProductInfoHeaderValue("FoxTail", "1.0") }}
     };
 
-    private string _publicKey = null!;
-    private string _publicKeyAlgorithm = null!;
+    private LoveAuthPubkeyResponse _publicKey = null!;
     
     public LoveAuthService(Logger logger) : base(logger)
     {}
@@ -38,11 +41,24 @@ public class LoveAuthService : EndpointService
         
         this.Logger.LogInfo(ResoCategory.LoveAuth, "Gathering public key...");
         LoveAuthPubkeyResponse pubkey = this.Get<LoveAuthPubkeyResponse>("/api/publickey");
-
-        this._publicKey = pubkey.Key;
-        this._publicKeyAlgorithm = pubkey.Algorithm;
         
         this.Logger.LogInfo(ResoCategory.LoveAuth, "Successfully got the server's public key!");
-        this.Logger.LogTrace(ResoCategory.LoveAuth, $"Algorithm: {this._publicKeyAlgorithm}, Key: {this._publicKey}");
+        this.Logger.LogTrace(ResoCategory.LoveAuth, $"Algorithm: {pubkey.Algorithm}, Key: {pubkey.Key}");
+
+        this._publicKey = pubkey;
+        KeyHelper.SetKey(pubkey.Key);
+    }
+
+    public LoveAuthUserResponse? ValidateJwt(string token)
+    {
+        string? json = JwtBuilder.Create()
+            .WithAlgorithm(new FoxAlgorithm())
+            .MustVerifySignature()
+            .Decode(token);
+
+        if (json == null)
+            return null;
+
+        return JsonConvert.DeserializeObject<LoveAuthUserResponse>(json);
     }
 }
