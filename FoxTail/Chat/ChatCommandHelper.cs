@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Text;
+using FoxTail.Chat.CommandSupport;
 using FoxTail.Chat.Platforms;
+using FoxTail.Chat.Platforms.Resonite;
 using FoxTail.Common;
 using FoxTail.Worlds;
 using FrooxEngine;
@@ -39,16 +41,14 @@ public class ChatCommandHelper : IDisposable
         _platforms.Add(platform);
     }
 
-    public async Task ReceiveCommand(IChatChannel channel, IChatUser user, string message)
+    public static (string command, EnumeratingArgContainer args) ParseSimpleCommand(string line)
     {
-        if (!message.StartsWith('!'))
-            return;
-        
-        this._context.Logger.LogDebug(ResoCategory.Chat, $"[{channel.Platform.Name}/#{channel.Name}] {user.Username}: {message}");
-
-        ReadOnlySpan<char> messageSpan = message.AsSpan()[1..];
+        ReadOnlySpan<char> messageSpan = line;
+        if (messageSpan.StartsWith('!') || messageSpan.StartsWith('/'))
+            messageSpan = messageSpan[1..];
+                
         int firstSpace = messageSpan.IndexOf(' ');
-
+        
         string command;
         if (firstSpace == -1)
         {
@@ -61,7 +61,12 @@ public class ChatCommandHelper : IDisposable
             messageSpan = messageSpan[(command.Length + 1)..];
         }
 
-        MemoryExtensions.SpanSplitEnumerator<char> args = messageSpan.Split(' ').GetEnumerator();
+        return (command, new EnumeratingArgContainer(messageSpan.ToString()));
+    }
+
+    public async Task ReceiveCommand(IChatChannel channel, IChatUser user, string command, ArgContainer args)
+    {
+        this._context.Logger.LogDebug(ResoCategory.Chat, $"[{channel.Platform.Name}/#{channel.Name}] {user.Username}: !{command} {args.GetAllArgs()}");
         
         // actually handle the command
         try
@@ -70,7 +75,7 @@ public class ChatCommandHelper : IDisposable
             {
                 case "echo":
                 {
-                    await Reply(messageSpan.ToString());
+                    await Reply(args.GetAllArgs());
                     break;
                 }
                 case "grid":
@@ -94,14 +99,14 @@ public class ChatCommandHelper : IDisposable
                         await Deny();
                         break;
                     }
+
+                    string? urlStr = args.GetArg("url");
                         
-                    if (!args.MoveNext())
+                    if (urlStr == null)
                     {
                         await Reply("I need the record URL to start the world.");
                         break;
                     }
-
-                    string urlStr = messageSpan[args.Current].ToString();
 
                     string? knownUrlStr = _context.WorldConfig.GetKnownWorldUrlById(urlStr);
                     if (knownUrlStr != null)
@@ -172,7 +177,7 @@ public class ChatCommandHelper : IDisposable
                 case "promote":
                 case "admin":
                 {
-                    await ReceiveCommand(channel, user, "!role admin");
+                    await ReceiveCommand(channel, user, "role", new EnumeratingArgContainer("admin"));
                     break;
                 }
                 case "role":
@@ -190,13 +195,13 @@ public class ChatCommandHelper : IDisposable
                         break;
                     }
                     
-                    if (!args.MoveNext())
+                    string? roleName = args.GetArg("role");
+                    if (roleName == null)
                     {
                         await Reply("I need the role to set you to. For example, you can do \"!role admin\".");
                         break;
                     }
-
-                    string roleName = messageSpan[args.Current].ToString();
+                    
                     PermissionSet? role = world.World.Permissions.Roles.
                         FirstOrDefault(r => r.RoleName.Value.Equals(roleName, StringComparison.InvariantCultureIgnoreCase));
 
@@ -238,14 +243,13 @@ public class ChatCommandHelper : IDisposable
                         await Deny();
                         break;
                     }
-                    
-                    if (!args.MoveNext())
+
+                    string? host = args.GetArg("hostUrl");
+                    if (host == null)
                     {
                         await Reply("I need the URL to allow.");
                         break;
                     }
-                    
-                    string host = messageSpan[args.Current].ToString();
                     
                     if (!Uri.TryCreate(host, UriKind.Absolute, out Uri? uri))
                     {
@@ -286,14 +290,14 @@ public class ChatCommandHelper : IDisposable
                         await Deny();
                         break;
                     }
-                    
-                    if (!args.MoveNext())
+
+                    string? friendName = args.GetArg("friendName");
+                    if (friendName == null)
                     {
                         await Reply("I need the username of the friend to add.");
                         break;
                     }
-                    
-                    string friendName = messageSpan[args.Current].ToString();
+
                     SkyFrost.Base.User? cloudUser = (await _context.Engine.Cloud.Users.GetUserByName(friendName)).Entity;
 
                     if (cloudUser == null)
@@ -365,6 +369,11 @@ public class ChatCommandHelper : IDisposable
         {
             return channel.Platform.SendMessageAsync(channel, content);
         }
+    }
+    
+    public Task ReceiveCommand(IChatChannel channel, IChatUser user, (string command, EnumeratingArgContainer args) command)
+    {
+        return ReceiveCommand(channel, user, command.command, command.args);
     }
 
     public void Dispose()

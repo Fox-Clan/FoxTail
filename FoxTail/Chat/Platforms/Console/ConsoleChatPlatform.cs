@@ -1,4 +1,5 @@
-﻿using FoxTail.Chat.Platforms.Resonite;
+﻿using FoxTail.Chat.CommandSupport;
+using FoxTail.Chat.Platforms.Resonite;
 using FrooxEngine;
 using SkyFrost.Base;
 using User = SkyFrost.Base.User;
@@ -32,10 +33,7 @@ public class ConsoleChatPlatform : IChatPlatform, IDisposable
                     Id = "console",
                 });
 
-                if (!line.StartsWith('!'))
-                    line = '!' + line;
-
-                await _context.CommandHelper.ReceiveCommand(channel, user, line);
+                await _context.CommandHelper.ReceiveCommand(channel, user, ChatCommandHelper.ParseSimpleCommand(line));
             }
         });
         thread.Name = "ConsoleChatPlatform Input Thread";

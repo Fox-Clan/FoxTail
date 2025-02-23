@@ -16,7 +16,7 @@ public class ResoniteChatPlatform : IChatPlatform
             ResoniteChatChannel channel = new(this, message);
             ResoniteChatUser user = new(this, (await this._context.Engine.Cloud.Users.GetUserCached(message.SenderId)).Entity);
 
-            await this._context.CommandHelper.ReceiveCommand(channel, user, message.Content);
+            await this._context.CommandHelper.ReceiveCommand(channel, user, ChatCommandHelper.ParseSimpleCommand(message.Content));
         };
     }
 

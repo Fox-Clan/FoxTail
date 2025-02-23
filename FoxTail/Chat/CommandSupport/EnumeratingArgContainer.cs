@@ -13,6 +13,11 @@ public class EnumeratingArgContainer : ArgContainer
         this._args = args;
         this._enumerator = args.GetEnumerator();
     }
+
+    public EnumeratingArgContainer(string args) : this(args.Split(' '))
+    {
+        
+    }
     
     public override string? GetArg(string name)
     {
