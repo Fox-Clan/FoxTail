@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Loader;
 using Elements.Core;
 using FoxTail.Common;
 using FoxTail.Common.Configuration;

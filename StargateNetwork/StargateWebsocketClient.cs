@@ -86,8 +86,27 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
 
                     if (gate != null)
                     {
-                        bool overRide = false;
+                        if (gate.IsPersistent)
+                        {
+                            this._logger.LogTrace(ResoCategory.Stargate, "Updating persistent gate...");
 
+                            gate.Id = ID;
+                            gate.SessionUrl = message.session_id;
+                            gate.ActiveUsers = message.current_users;
+                            gate.MaxUsers = message.max_users;
+                            gate.GateStatus = "IDLE";
+                            gate.SessionName = message.gate_name;
+                            gate.OwnerName = message.host_id;
+                            gate.UpdateDate = UnixTimestamp;
+                            gate.DialedGateId = "";
+                            gate.PublicGate = message.@public;
+                            
+                            await this._db.SaveChangesAsync();
+                            Send("{code: 200, message: \"Address accepted\" }");
+                            break;
+                        }
+                        
+                        bool overRide = false;
                         if (UnixTimestamp - gate.UpdateDate > 60)
                         {
                             this._logger.LogTrace(ResoCategory.Stargate, "database entry stale, overriding...");
@@ -342,9 +361,7 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
                          {
                              this._logger.LogTrace(ResoCategory.Stargate, "Requested gate is in closed world. starting...");
                              await this._worldManager.StartWorld(worldRecordUri);
-
-                             //updates gate info
-                             // TODO: (jvy) find out what the fuck the above comment means
+                             await Task.Delay(1000); //TODO make this more robust by sending a dynamic impulse to the auto-gateSetup script ingame 
                          }
                     }
 
@@ -596,6 +613,29 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
                     this._logger.LogError(ResoCategory.Stargate, "Exception caught during keep alive: " + e);
                     break;
                 }
+            }
+
+            case "requestPersistence":
+            {
+                this._logger.LogTrace(ResoCategory.Stargate, "Stargate request persistence...");
+                Stargate? gate = await this._db.FindGateByAddress(message.gate_address);
+
+                if (gate == null)
+                {
+                    this._logger.LogTrace(ResoCategory.Stargate, "Stargate not found when requesting persistence!");
+                    Send("404");
+                    break;
+                }
+                
+                gate.IsPersistent = true;
+                gate.WorldRecord = message.WorldRecord;
+                gate.UpdateDate = UnixTimestamp;
+                await this._db.SaveChangesAsync();
+                
+                this._logger.LogTrace(ResoCategory.Stargate, "Stargate set as persistent");
+                Send("200");
+                
+                break;
             }
         }
         

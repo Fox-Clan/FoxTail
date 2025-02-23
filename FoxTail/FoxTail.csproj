@@ -37,6 +37,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\FoxTail.Common\FoxTail.Common.csproj" />
+      <ProjectReference Include="..\FoxTail.LoveAuth\FoxTail.LoveAuth.csproj" />
       <ProjectReference Include="..\StargateNetwork\StargateNetwork.csproj" />
     </ItemGroup>
     

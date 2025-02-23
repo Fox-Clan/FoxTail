@@ -1,4 +1,5 @@
-﻿using FoxTail.Common;
+﻿using System.Reflection;
+using FoxTail.Common;
 using Microsoft.EntityFrameworkCore;
 using NotEnoughLogs;
 using StargateNetwork.Types;
@@ -15,7 +16,6 @@ public class StargateServer : IDisposable
     internal readonly IStargateWorldManager WorldManager;
     
     private readonly WebSocketServer _wsServer;
-    private readonly StargateBunkumServer _bunkumServer;
     private readonly StargateConfiguration _config;
 
     private bool _shouldRun;
@@ -28,10 +28,13 @@ public class StargateServer : IDisposable
         this._config = config;
         this.WorldManager = worldManager;
         
-        this._bunkumServer = new StargateBunkumServer();
-        
         this._wsServer = new WebSocketServer(config.WebsocketHostUrl);
         this._wsServer.AddWebSocketService<StargateWebsocketClient>("/Echo");
+        
+        FoxBunkumServer.RegisterSetupAction(s =>
+        {
+            s.DiscoverEndpointsFromAssembly(Assembly.GetExecutingAssembly());
+        });
     }
 
     public void Start()
@@ -46,9 +49,6 @@ public class StargateServer : IDisposable
         if(this._config.WebsocketEnabled)
             this._wsServer.Start();
         
-        if(this._config.BunkumEnabled)
-            this._bunkumServer.Start();
-        
         Thread dbCleanThread = new(CleanStaleDb)
         {
             Name = "Stargate Database Cleaner",
@@ -61,7 +61,6 @@ public class StargateServer : IDisposable
     {
         this._shouldRun = false;
         this._wsServer.Stop();
-        this._bunkumServer.Stop();
     }
     
     private void CleanStaleDb()

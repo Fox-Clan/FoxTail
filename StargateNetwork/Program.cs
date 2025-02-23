@@ -1,4 +1,6 @@
-﻿using NotEnoughLogs;
+﻿using System.Reflection;
+using FoxTail.Common;
+using NotEnoughLogs;
 using NotEnoughLogs.Behaviour;
 using StargateNetwork.Worlds.Dummy;
 
@@ -23,7 +25,7 @@ internal static class Program
         config.WebsocketEnabled = true;
         config.BunkumEnabled = true;
 
-        Logger logger = new(new LoggerConfiguration()
+        Logger logger = new(new LoggerConfiguration
         {
             Behaviour = new DirectLoggingBehaviour(),
             MaxLevel = LogLevel.Trace,
@@ -32,7 +34,14 @@ internal static class Program
         StargateServer server = new(logger, config, new DummyStargateWorldManager());
         server.Start();
 
+        if (config.BunkumEnabled)
+        {
+            FoxBunkumServer.Initialize();
+            FoxBunkumServer.Start();
+        }
+
         Console.ReadKey();
         server.Stop();
+        FoxBunkumServer.Stop();
     }
 }

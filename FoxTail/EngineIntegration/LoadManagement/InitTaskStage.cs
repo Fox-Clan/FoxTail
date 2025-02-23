@@ -5,5 +5,6 @@ public enum InitTaskStage : byte
     Immediate,
     Login,
     Authenticated,
+    BunkumInit,
     WorldsInitialized,
 }
