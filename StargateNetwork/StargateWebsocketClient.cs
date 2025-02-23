@@ -34,7 +34,6 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
                 if (gate == null)
                 {
                     this._logger.LogTrace(ResoCategory.Stargate, "Current gate not found");
-                    Send("CSValidCheck:404");
                     return;
                 }
 
@@ -303,14 +302,13 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
                     if (requestedGate == null)
                     {
                         this._logger.LogTrace(ResoCategory.Stargate, "Requested gate not found");
-                        Send("CSValidCheck:404");
+                        Send("CSDialCheck:404");
                         break;
                     }
 
                     if (currentGate == null)
                     {
                         this._logger.LogTrace(ResoCategory.Stargate, "Current gate not found");
-                        Send("CSValidCheck:404");
                         break;
                     }
 
@@ -327,7 +325,7 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
                     {
                         this._logger.LogTrace(ResoCategory.Stargate, "Gate is busy");
                         this._logger.LogTrace(ResoCategory.Stargate, "Gate status: " + requestedGate.GateStatus);
-                        Send("CSValidCheck:403");
+                        Send("CSDialCheck:403");
                         break;
                     }
 
@@ -472,7 +470,13 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
                     if (currentGate == null)
                     {
                         this._logger.LogTrace(ResoCategory.Stargate, "Current gate not found");
-                        Send("CSValidCheck:404");
+                        break;
+                    }
+                    
+                    Stargate? dialedGate = await this._db.FindGateById(currentGate.DialedGateId);
+                    if (dialedGate == null)
+                    {
+                        this._logger.LogTrace(ResoCategory.Stargate, "Dialed gate not found");
                         break;
                     }
 
@@ -482,6 +486,7 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
 
                     currentGate.DialedGateId = "";
                     currentGate.GateStatus = "IDLE";
+                    dialedGate.GateStatus = "IDLE";
                     await this._db.SaveChangesAsync();
 
                     break;
@@ -511,7 +516,7 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
 
                     gate.ActiveUsers = message.currentUsers;
                     gate.MaxUsers = message.maxUsers;
-                    gate.GateStatus = message.gate_status;
+                    gate.GateStatus = message.gate_status; //TODO something is preventing this from working properly
                     gate.UpdateDate = UnixTimestamp;
                     await this._db.SaveChangesAsync();
 
@@ -539,7 +544,6 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
                     if (gate == null)
                     {
                         this._logger.LogTrace(ResoCategory.Stargate, "Current gate not found");
-                        Send("CSValidCheck:404");
                         break;
                     }
 
@@ -552,7 +556,6 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
                     if (incomingGate == null)
                     {
                         this._logger.LogTrace(ResoCategory.Stargate, "Incoming gate not found");
-                        Send("CSValidCheck:404");
                         break;
                     }
 
@@ -577,7 +580,6 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
                     if (gate == null)
                     {
                         this._logger.LogTrace(ResoCategory.Stargate, "Current gate not found");
-                        Send("CSValidCheck:404");
                         break;
                     }
 
