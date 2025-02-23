@@ -1,5 +1,4 @@
-﻿using FoxTail.Chat;
-using FoxTail.Chat.Platforms;
+﻿using FoxTail.Chat.Platforms;
 using FoxTail.Common;
 using FrooxEngine;
 using SkyFrost.Base;

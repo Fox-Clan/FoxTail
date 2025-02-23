@@ -1,8 +1,6 @@
-﻿using FoxTail.Chat.CommandSupport;
-using FoxTail.Chat.Platforms.Resonite;
+﻿using FoxTail.Chat.Platforms.Resonite;
 using FrooxEngine;
 using SkyFrost.Base;
-using User = SkyFrost.Base.User;
 
 namespace FoxTail.Chat.Platforms.Console;
 

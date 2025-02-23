@@ -5,7 +5,6 @@ using System.Text;
 using FoxTail.Chat.CommandSupport;
 using FoxTail.Chat.Platforms;
 using FoxTail.Chat.Platforms.Console;
-using FoxTail.Chat.Platforms.Resonite;
 using FoxTail.Common;
 using FoxTail.Worlds;
 using FrooxEngine;
