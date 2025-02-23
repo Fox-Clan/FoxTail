@@ -602,17 +602,14 @@ public class StargateWebsocketClient : WebSocketBehavior, IDisposable
     
     protected override void OnMessage(MessageEventArgs wibi)
     {
-        Task.Run(async () =>
+        try
         {
-            try
-            {
-                await OnMessageAsync(wibi);
-            }
-            catch (Exception e)
-            {
-                this._logger.LogError(ResoCategory.Stargate, $"General exception while trying to handle message '{wibi.Data}': {e}");
-            }
-        });
+            OnMessageAsync(wibi).Wait();
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError(ResoCategory.Stargate, $"General exception while trying to handle message '{wibi.Data}': {e}");
+        }
     }
 
     private static long UnixTimestamp => DateTimeOffset.UtcNow.ToUnixTimeSeconds();
