@@ -18,8 +18,6 @@ public class LoveAuthService : EndpointService
         DefaultRequestHeaders = { UserAgent = { new ProductInfoHeaderValue("FoxTail", "1.0") }}
     };
 
-    private LoveAuthPubkeyResponse _publicKey = null!;
-    
     public LoveAuthService(Logger logger) : base(logger)
     {}
 
@@ -44,7 +42,6 @@ public class LoveAuthService : EndpointService
         this.Logger.LogInfo(ResoCategory.LoveAuth, "Successfully got the server's public key!");
         this.Logger.LogTrace(ResoCategory.LoveAuth, $"Algorithm: {pubkey.Algorithm}, Key: {pubkey.Key}");
 
-        this._publicKey = pubkey;
         KeyHelper.SetKey(pubkey.Key);
     }
 

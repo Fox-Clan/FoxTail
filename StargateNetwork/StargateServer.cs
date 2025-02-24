@@ -10,7 +10,7 @@ namespace StargateNetwork;
 
 public class StargateServer : IDisposable
 {
-    internal static StargateServer Instance { get; private set; }
+    internal static StargateServer Instance { get; private set; } = null!;
 
     internal readonly Logger Logger;
     internal readonly IStargateWorldManager WorldManager;

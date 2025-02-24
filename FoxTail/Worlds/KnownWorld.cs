@@ -11,14 +11,14 @@ public class KnownWorld
     public string KnownWorldId { get; set; } = "example";
     public string? OverrideName { get; set; }
 
-    public bool StartWithServer { get; set; } = false;
+    public bool StartWithServer { get; set; }
 
     public string? InviteMessage { get; set; } = "Come join my world!";
     public IEnumerable<string> InviteUsernames { get; set; } = [];
 
     [JsonConverter(typeof(StringEnumConverter))]
     public SessionAccessLevel AccessLevel { get; set; } = SessionAccessLevel.Contacts;
-    public bool HideFromListing { get; set; } = false;
+    public bool HideFromListing { get; set; }
 
     public string RecordUrl { get; set; } = "resrec:///Owner/ID";
 

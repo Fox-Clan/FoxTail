@@ -7,31 +7,35 @@ namespace FoxTail.Chat.Platforms.Console;
 
 public class ConsoleChatPlatform : IChatPlatform, IDisposable
 {
-    private readonly HeadlessContext _context;
     private readonly CancellationTokenSource _cts = new();
     
     public ConsoleChatPlatform(HeadlessContext context)
     {
-        this._context = context;
-        
-        Thread thread = new(async () =>
+        Thread thread = new(async void () =>
         {
-            using StreamReader reader = new(System.Console.OpenStandardInput(), System.Console.InputEncoding);
-            while (!this._disposed && await reader.ReadLineAsync(this._cts.Token) is { } line)
+            try
             {
-                Message message = new()
+                using StreamReader reader = new(System.Console.OpenStandardInput(), System.Console.InputEncoding);
+                while (!this._disposed && await reader.ReadLineAsync(this._cts.Token) is { } line)
                 {
-                    Content = line,
-                    SenderId = "console"
-                };
+                    Message message = new()
+                    {
+                        Content = line,
+                        SenderId = "console"
+                    };
 
-                ResoniteChatChannel channel = new(this, message);
-                ConsoleChatUser user = new(this);
+                    ResoniteChatChannel channel = new(this, message);
+                    ConsoleChatUser user = new(this);
                 
-                await _context.CommandHelper.ReceiveCommand(channel, user, ChatCommandHelper.ParseSimpleCommand(line));
-            }
+                    await context.CommandHelper.ReceiveCommand(channel, user, ChatCommandHelper.ParseSimpleCommand(line));
+                }
             
-            this._context.Logger.LogTrace(ResoCategory.Chat, "Console input thread exited");
+                context.Logger.LogTrace(ResoCategory.Chat, "Console input thread exited");
+            }
+            catch (Exception e)
+            {
+                context.Logger.LogError(ResoCategory.Chat, "Console input thread crashed: " + e);
+            }
         });
         thread.Name = "ConsoleChatPlatform Input Thread";
         thread.Start();

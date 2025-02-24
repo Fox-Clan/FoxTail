@@ -6,7 +6,7 @@ namespace FoxTail.LoveAuth.Crypto;
 
 internal static class KeyHelper
 {
-    private static Ed25519PublicKeyParameters _key;
+    private static Ed25519PublicKeyParameters _key = null!;
 
     internal static void SetKey(string data)
     {

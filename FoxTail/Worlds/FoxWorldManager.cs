@@ -10,9 +10,8 @@ namespace FoxTail.Worlds;
 public class FoxWorldManager
 {
     private readonly HeadlessContext _context;
-    private readonly WorldManager _mgr;
 
-    private uint _idIncrement = 0;
+    private uint _idIncrement;
     private uint LatestWorldId => Interlocked.Increment(ref _idIncrement);
 
     private readonly List<ManagedWorld> _worlds = new(1);
@@ -20,7 +19,6 @@ public class FoxWorldManager
     public FoxWorldManager(HeadlessContext context)
     {
         this._context = context;
-        this._mgr = context.Engine.WorldManager;
     }
 
     public IEnumerable<ManagedWorld> WorldsListForUser(IChatUser user)

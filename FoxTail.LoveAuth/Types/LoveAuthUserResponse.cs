@@ -8,12 +8,12 @@ public class LoveAuthUserResponse
 {
     public Guid Id { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
-    public string ResoniteUserId { get; set; }
+    public string ResoniteUserId { get; set; } = null!;
     public string? DiscordId { get; set; }
     public string? MisskeyId { get; set; }
     
     [JsonProperty("aud")]
-    public string Audience { get; set; }
+    public string Audience { get; set; } = null!;
     [JsonProperty("exp")]
     public long Expiration { get; set; }
 }

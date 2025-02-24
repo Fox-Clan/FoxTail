@@ -24,7 +24,7 @@ public class HeadlessRunner
         ];
     
     public bool ExitComplete { get; private set; }
-    private bool _exitRequested = false;
+    private bool _exitRequested;
 
     private float TickRate => _context.Config.TickRate;
     
@@ -84,7 +84,7 @@ public class HeadlessRunner
         };
         
         Stopwatch sw = Stopwatch.StartNew(); 
-        await _context.Engine.Initialize(path, options, _context.SystemInfo, null, this._progress);
+        await _context.Engine.Initialize(path, options, _context.SystemInfo, null!, this._progress);
         this._context.Logger.LogInfo(ResoCategory.Runner, $"Engine initialized after {sw.ElapsedMilliseconds}ms.");
         this._context.Logger.LogInfo(ResoCategory.Runner, "Starting userspace...");
         sw.Restart();
@@ -153,7 +153,7 @@ public class HeadlessRunner
     }
     
     private DateTime _dspStartTime = DateTime.UtcNow;
-    private float _dspTime = 0f;
+    private float _dspTime;
 
     private void StartEngineThread()
     {

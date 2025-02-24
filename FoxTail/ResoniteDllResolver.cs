@@ -51,11 +51,4 @@ internal static class ResoniteDllResolver
 
         return ret;
     }
-
-    private static Assembly? ResolveAssembly(object? sender, ResolveEventArgs args)
-    {
-        Console.BackgroundColor = ConsoleColor.Red;
-        Console.WriteLine("ASSEMBLY LOAD FAIL: " + args.Name);
-        return null;
-    }
 }

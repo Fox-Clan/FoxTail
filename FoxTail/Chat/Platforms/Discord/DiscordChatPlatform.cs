@@ -75,15 +75,16 @@ public class DiscordChatPlatform : IChatPlatform, IDisposable
         return SendMessageAsync(channel, $"# {world.Name}\n`{url.ToString()}`\n-# Copy this link and paste it into Resonite to join!");
     }
     
-    private async Task MessageReceived(SocketMessage message)
+    private Task MessageReceived(SocketMessage message)
     {
         if (message.Author.Id == this._client.CurrentUser.Id)
-            return;
+            return Task.CompletedTask;
         
         DiscordChatChannel channel = new(this, message.Channel);
         DiscordChatUser user = new(this, message.Author);
 
         _ = Task.Run(async () => await this._context.CommandHelper.ReceiveCommand(channel, user, ChatCommandHelper.ParseSimpleCommand(message.Content)));
+        return Task.CompletedTask;
     }
 
     private string _lastCustomStatus = "";

@@ -49,7 +49,7 @@ public class FoxSystemInfo : ISystemInfo
     }
 
     public HeadOutputDevice HeadDevice => HeadOutputDevice.Headless;
-    public string UniqueDeviceIdentifier => null;
+    public string UniqueDeviceIdentifier => null!;
     public bool IsAOT => false;
     public int MaxTextureSize => 16384;
     public string XRDeviceName => "FoxTail Headless";
@@ -63,7 +63,7 @@ public class FoxSystemInfo : ISystemInfo
     public int? PhysicalCores { get; }
     public long MemoryBytes { get; }
     public long VRAMBytes { get; }
-    public string StereoRenderingMode { get; } = null;
+    public string StereoRenderingMode { get; } = null!;
     
     public bool SupportsTextureFormat(TextureFormat format) => true;
 

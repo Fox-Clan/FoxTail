@@ -1,15 +1,9 @@
 ﻿using System.Collections.Frozen;
-using System.Diagnostics;
 using System.Reflection;
-using System.Text;
 using FoxTail.Chat.CommandSupport;
 using FoxTail.Chat.Platforms;
 using FoxTail.Chat.Platforms.Console;
 using FoxTail.Common;
-using FoxTail.Worlds;
-using FrooxEngine;
-using SkyFrost.Base;
-using User = FrooxEngine.User;
 
 namespace FoxTail.Chat;
 

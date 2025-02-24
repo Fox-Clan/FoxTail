@@ -19,7 +19,7 @@ public class CallbackEndpoints : EndpointGroup
         if (token == null)
             return new Response("Token is missing!", ContentType.Plaintext, HttpStatusCode.BadRequest);
 
-        LoveAuthUserResponse? user = null;
+        LoveAuthUserResponse? user;
         try
         {
             user = service.ValidateJwt(token);

@@ -16,9 +16,8 @@ namespace FoxTail;
 
 internal static class Program
 {
-    public static HeadlessRunner Runner;
-
-    public static HeadlessContext Context;
+    private static HeadlessRunner _runner = null!;
+    public static HeadlessContext Context = null!;
     
     [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
     public static async Task Main()
@@ -83,21 +82,21 @@ internal static class Program
             Context.Logger.LogWarning(ResoCategory.FrooxEngine, s);
         };
 
-        Runner = new HeadlessRunner(Context);
+        _runner = new HeadlessRunner(Context);
 
         AppDomain.CurrentDomain.ProcessExit += (_, _) => OnProgramExiting();
         Console.CancelKeyPress += (_, _) => OnProgramExiting();
 
-        Context.Runner = Runner;
+        Context.Runner = _runner;
         
-        await Runner.InitializeEngineAsync();
-        await Runner.StartFullInitTasksAsync(); // engine is mostly up, setup foxtail stuff
+        await _runner.InitializeEngineAsync();
+        await _runner.StartFullInitTasksAsync(); // engine is mostly up, setup foxtail stuff
         
         // since loading is complete, perform a big gc to clear out all the loading stuff
         GC.Collect(GC.MaxGeneration, GCCollectionMode.Aggressive, true, true);
 
         // this blocks the thread until the engine exits.
-        await Runner.WaitForEngineExitAsync();
+        await _runner.WaitForEngineExitAsync();
         
         Context.Dispose();
     }
@@ -127,8 +126,8 @@ internal static class Program
     private static void OnProgramExiting()
     {
         Context.Logger.LogInfo(ResoCategory.Runner, "Exit has been requested by the host, beginning shutdown process.");
-        Runner.Exit();
-        Runner.WaitForEngineExit();
+        _runner.Exit();
+        _runner.WaitForEngineExit();
         Context.Dispose();
     }
 }
