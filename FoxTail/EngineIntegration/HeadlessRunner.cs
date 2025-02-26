@@ -35,7 +35,7 @@ public class HeadlessRunner
         
         ResoniteDllResolver.Initialize();
         
-        this._clock = new ThrottledClock();
+        this._clock = new ThrottledClock(context.Config.UsePreciseClock);
         
         context.Engine = new Engine();
         context.SystemInfo = new FoxSystemInfo(context, this._clock);
@@ -172,6 +172,7 @@ public class HeadlessRunner
 
         while (!ExitComplete)
         {
+            this._clock.TargetUpdateHz = this.TickRate;
             try
             {
                 EngineTick();

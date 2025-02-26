@@ -6,6 +6,8 @@
 // See the original code here on GitHub:
 // https://github.com/ppy/osu-framework/blob/527d836d37009ce0b84521ad4b74914acbe89927/osu.Framework/Timing/ThrottledFrameClock.cs
 
+using FoxTail.Common.Timing.ThrottleMethods;
+
 namespace FoxTail.Common.Timing;
 
 public sealed class ThrottledClock : Clock
@@ -13,6 +15,35 @@ public sealed class ThrottledClock : Clock
    public double TargetUpdateHz = 60.0d;
    public bool ShouldThrottle = true;
    public double TimeSlept { get; private set; }
+
+   private readonly IThrottleMethod _throttleMethod;
+   
+   public ThrottledClock(bool allowPreciseThrottle = true)
+   {
+      if (!allowPreciseThrottle)
+         goto fallback;
+
+      try
+      {
+         if (OperatingSystem.IsWindows())
+            this._throttleMethod = new WindowsThrottleMethod();
+         // else if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() || OperatingSystem.IsFreeBSD())
+            // this._throttleMethod = new UnixThrottleMethod();
+         else goto fallback;
+
+         // test the throttling method
+         if (!this._throttleMethod.Sleep(0))
+            goto fallback;
+      }
+      catch
+      {
+         goto fallback;
+      }
+
+      return;
+      fallback:
+      this._throttleMethod = new ImpreciseThrottleMethod();
+   }
 
    public void Wait()
    {
@@ -54,12 +85,17 @@ public sealed class ThrottledClock : Clock
          return 0;
       
       double before = CurrentTime;
-      
-      TimeSpan timeSpan = TimeSpan.FromMilliseconds(milliseconds);
 
-      // The actual function that waits. Adjust as necessary.
-      Thread.Sleep(timeSpan);
+      if (milliseconds == 0)
+         this._throttleMethod.Yield();
+      else
+         this._throttleMethod.Sleep(milliseconds);
 
       return (CurrentTime = SourceTime) - before;
    }
+
+   public string ThrottleMethodName => this._throttleMethod.GetType().Name;
+
+   public override string ToString()
+      => $"{this.GetType().Name}({this.ThrottleMethodName}) UPS: {this.FramesPerSecond:N2}, Jitter: {this.Jitter:N2}ms";
 }

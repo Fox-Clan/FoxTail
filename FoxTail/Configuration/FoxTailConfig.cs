@@ -13,5 +13,6 @@ public class FoxTailConfig
     public IEnumerable<int> AllowedOSCReceiverPorts { get; set; } = [];
 
     public bool LogUpdatesPerSecond { get; set; }
+    public bool UsePreciseClock { get; set; } = true;
     public bool DisableChatInitialization { get; set; }
 }

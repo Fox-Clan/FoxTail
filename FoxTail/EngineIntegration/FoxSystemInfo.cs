@@ -18,6 +18,8 @@ public class FoxSystemInfo : ISystemInfo
         this._context = context;
         this._clock = clock;
         
+        context.Logger.LogInfo(ResoCategory.EngineInit, "Gathering hardware info...");
+        
         HardwareInfo info = new();
         info.RefreshOperatingSystem();
         info.RefreshCPUList(false);
@@ -31,6 +33,7 @@ public class FoxSystemInfo : ISystemInfo
 
         this.MemoryBytes = (long)info.MemoryStatus.TotalPhysical;
         
+        context.Logger.LogDebug(ResoCategory.EngineInit, $"Throttle method: {clock.ThrottleMethodName}");
     }
 
     public Platform Platform
@@ -81,7 +84,9 @@ public class FoxSystemInfo : ISystemInfo
     
     public float FPS { get; private set; }
     public float ImmediateFPS => FPS;
-    public float RenderTime => 0;
+    
+    // we misuse this to measure jitter so it shows up in game
+    public float RenderTime { get; private set; }
     public float ExternalUpdateTime => 0;
     
     private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
@@ -108,6 +113,7 @@ public class FoxSystemInfo : ISystemInfo
     public void FrameFinished()
     {
         this.FPS = this._clock.FramesPerSecond;
+        this.RenderTime = this._clock.Jitter;
         
         if (this._stopwatch.Elapsed.TotalSeconds < 1.0)
             return;
@@ -120,6 +126,6 @@ public class FoxSystemInfo : ISystemInfo
             _lives++;
         
         if(_context.Config.LogUpdatesPerSecond)
-            this._context.Logger.LogDebug(ResoCategory.Runner, $"Engine UPS: {FPS:N2}");
+            this._context.Logger.LogDebug(ResoCategory.Runner, this._clock.ToString());
     }
 }
