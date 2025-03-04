@@ -15,20 +15,22 @@ public partial class UnixThrottleMethod : IThrottleMethod
     [StructLayout(LayoutKind.Sequential)]
     private struct TimeSpec
     {
-        public ulong Seconds;
-        public ulong NanoSeconds;
+        public long Seconds;
+        public long NanoSeconds;
     }
     
     public bool Sleep(double ms)
     {
-        const double nsPerMs = 1000000;
+        const double nsPerMs = 1_000_000;
+        const double msPerSecond = 1000;
         
         TimeSpec timeSpec = new()
         {
-            Seconds = (ulong)(ms / nsPerMs),
-            NanoSeconds = (ulong)(ms % nsPerMs)
+            Seconds = (long)(ms / msPerSecond),
+            NanoSeconds = (long)((ms % nsPerMs) * nsPerMs)
         };
 
+        // Console.WriteLine($"req: s:{timeSpec.Seconds} ns:{timeSpec.NanoSeconds}");
         int result = nanosleep(timeSpec, out TimeSpec _);
         return result == 0;
     }
