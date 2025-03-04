@@ -27,8 +27,8 @@ public sealed class ThrottledClock : Clock
       {
          if (OperatingSystem.IsWindows())
             this._throttleMethod = new WindowsThrottleMethod();
-         // else if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() || OperatingSystem.IsFreeBSD())
-            // this._throttleMethod = new UnixThrottleMethod();
+         else if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() || OperatingSystem.IsFreeBSD())
+            this._throttleMethod = new UnixThrottleMethod();
          else goto fallback;
 
          // test the throttling method
