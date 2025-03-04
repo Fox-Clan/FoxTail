@@ -33,6 +33,20 @@ internal static class ResoniteDllResolver
 
             headlessPath ??= "runtimes";
 
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                libraryName += ".dll";
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ||
+                     RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
+            {
+                libraryName = $"lib{libraryName}.so";
+            }
+            else
+            {
+                throw new NotImplementedException("Unsupported platform for library detection");
+            }
+
             try
             {
                 string path = Path.Join(headlessPath, RuntimeInformation.RuntimeIdentifier, "native", libraryName);
